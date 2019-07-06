@@ -6,7 +6,7 @@
 //  Copyright © 2019 Guest User. All rights reserved.
 //
 
-#include "bogle_game.hpp"
+#include "boggle_game.hpp"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
