@@ -1,6 +1,6 @@
 //
 //  dictionary.hpp
-//  BogleMultiProcess
+//  BoggleMultiProcess
 //
 //  Created by Gary Powell on 7/5/19.
 //  Copyright © 2019 Guest User. All rights reserved.

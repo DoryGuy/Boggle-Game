@@ -1,6 +1,6 @@
 //
 //  bogle_game.cpp
-//  BogleMultiProcess
+//  BoggleMultiProcess
 //
 //  Created by Gary Powell on 7/5/19.
 //  Copyright © 2019 Guest User. All rights reserved.
@@ -20,7 +20,7 @@
 
 
 
-BogleGame::BogleGame()
+BoggleGame::BoggleGame()
 {
     init_board();
     moveFnPtrs.reserve(8); // eight possible moves
@@ -36,7 +36,7 @@ BogleGame::BogleGame()
     dictionary.printDictionary(std::cout);
 }
     
-void BogleGame::init_board() {
+void BoggleGame::init_board() {
     using std::string;
     foundWords.clear();
     // stupid but easy way to fill board.
@@ -55,7 +55,7 @@ void BogleGame::init_board() {
     }
 }
     
-void BogleGame::fill_board_for_testing(std::string testData)
+void BoggleGame::fill_board_for_testing(std::string testData)
 {
     using std::string;
     board.clear();
@@ -71,7 +71,7 @@ void BogleGame::fill_board_for_testing(std::string testData)
     }
 }
     
-void BogleGame::checkWord(std::string word) {
+void BoggleGame::checkWord(std::string word) {
     using std::transform;
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto result = dictionary.isInDictionary(word);
@@ -84,7 +84,7 @@ void BogleGame::checkWord(std::string word) {
     
 // called recursively until all directions are tried
 // and while it's possible to move.
-void BogleGame::moveNextPostion(std::string currentWord, Location original_location) {
+void BoggleGame::moveNextPostion(std::string currentWord, Location original_location) {
     for (auto fn: moveFnPtrs) {
         Location location(original_location);
         std::string newWord(currentWord);
@@ -101,7 +101,7 @@ void BogleGame::moveNextPostion(std::string currentWord, Location original_locat
 }
     
     // return the unique words found
-std::set<std::string> BogleGame::play_game(){
+std::set<std::string> BoggleGame::play_game(){
     using std::string;
     using std::vector;
     using std::thread;

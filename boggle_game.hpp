@@ -1,6 +1,6 @@
 //
 //  bogle_game.hpp
-//  BogleMultiProcess
+//  BoggleMultiProcess
 //
 //  Created by Gary Powell on 7/5/19.
 //  Copyright © 2019 Guest User. All rights reserved.
@@ -18,17 +18,17 @@
 #include <mutex>
 
 
-class BogleGame {
+class BoggleGame {
 private:
     // the real game has a "Qu" so we need to store two letters, or always just insert "u" when we see
     // "Q". Thus we can't use just a single char for the letter. For the moment we'll use std::string.
     // maybe later an optimization will be to use a special short string fn.
-    using  BogleBoard_t=std::vector<std::string>;
+    using  BoggleBoard_t=std::vector<std::string>;
     
     // maybe later use a more generic fn pointer here.
     using MoveFunctionPtr_t = Move_t (Location::*)();
     
-    BogleBoard_t board;
+    BoggleBoard_t board;
     std::vector<MoveFunctionPtr_t> moveFnPtrs;
     std::string currentWord;
     WordDictionary dictionary;
@@ -42,7 +42,7 @@ private:
     void moveNextPostion(std::string currentWord, Location original_location);
     
 public:
-    BogleGame();
+    BoggleGame();
     void init_board() ;
     void fill_board_for_testing(std::string testData);
 

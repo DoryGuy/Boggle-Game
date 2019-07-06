@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  Bogle
+//  Boggle
 //
 //  Created by Gary Powell on 6/18/19.
 //  Copyright © 2019 Guest User. All rights reserved.
@@ -14,7 +14,7 @@
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    BogleGame game;
+    BoggleGame game;
     
     
     game.fill_board_for_testing("Qitexxxxxxxxxxxx"); // horizontal
