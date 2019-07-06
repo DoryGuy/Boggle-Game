@@ -23,7 +23,7 @@ int main(int argc, const char * argv[]) {
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 1);
+    assert(result.size() == 2);
     
     game.fill_board_for_testing("Testxxxxxxxxxxxx"); // horizontal
     result = game.play_game();

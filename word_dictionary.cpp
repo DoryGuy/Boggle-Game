@@ -59,22 +59,22 @@ WordDictionary::WordDictionary() {
 }
 
 // check for both forward spelling and reverse spelling.
-std::pair<bool,std::string> WordDictionary::isInDictionary(std::string word) const {
+std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictionary(std::string word) const {
     using std::reverse;
     
     auto wordsListIter = dictionary.find(hashTheWord(word));
     if (wordsListIter != dictionary.end()) {
         auto iter = wordsListIter->second.find(word);
         if (iter != wordsListIter->second.end()) {
-            return {true,std::move(word)};
+            return {FoundWord_t::Found,std::move(word)};
         }
         reverse(word.begin(), word.end());
         iter = wordsListIter->second.find(word);
         if (iter != wordsListIter->second.end()) {
-            return {true,std::move(word)};
+            return {FoundWord_t::Found,std::move(word)};
         }
     }
-    return {false,{}};
+    return {FoundWord_t::NotFound,{}};
 }
 
 void WordDictionary::printDictionary(std::ostream &os) const {

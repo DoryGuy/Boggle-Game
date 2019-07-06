@@ -23,9 +23,10 @@ private:
     // a hash for our dictionary.
     unsigned long hashTheWord(std::string word) const;
 public:
+    enum class FoundWord_t { Found, NotFound };
     WordDictionary();
     // check for both forward spelling and reverse spelling.
-    std::pair<bool,std::string> isInDictionary(std::string word) const;
+    std::pair<FoundWord_t,std::string> isInDictionary(std::string word) const;
     void printDictionary(std::ostream &os) const;
 };
 #endif /* dictionary_hpp */

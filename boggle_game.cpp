@@ -75,10 +75,10 @@ void BoggleGame::checkWord(std::string word) {
     using std::transform;
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto result = dictionary.isInDictionary(word);
-    if (result.first) {
+    if (result.first == WordDictionary::FoundWord_t::Found) {
         std::lock_guard<std::mutex> lockFoundWords(foundWordsMutex);
         std::cout << " Found " << result.second << std::endl;
-        foundWords.emplace(std::move(result.second));
+        foundWords.insert(std::move(result.second));
     }
 }
     
@@ -93,9 +93,9 @@ void BoggleGame::moveNextPostion(std::string currentWord, Location original_loca
             newWord += board[indexToMove(location.getRow(), location.getCol())];
             checkWord(newWord);
             // debug only look for <= 4 letter words.
-            if (newWord.length() < 4 ) {
+            //if (newWord.length() < 4 ) {
                 moveNextPostion(newWord, location);
-            }
+            //}
         }
     }
 }
