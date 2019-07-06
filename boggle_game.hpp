@@ -6,8 +6,8 @@
 //  Copyright © 2019 Guest User. All rights reserved.
 //
 
-#ifndef bogle_game_hpp
-#define bogle_game_hpp
+#ifndef boggle_game_hpp
+#define boggle_game_hpp
 
 #include <set>
 #include <string>
@@ -49,4 +49,4 @@ public:
     std::set<std::string> play_game();};
 
 
-#endif /* bogle_game_hpp */
+#endif /* boggle_game_hpp */
