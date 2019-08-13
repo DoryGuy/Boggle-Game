@@ -8,14 +8,14 @@
 
 #include "location.hpp"
 #include "GameConstants.hpp"
+#include <algorithm>
 
     
 void Location::init_board() {
     
     if (locations_available.size() == max_board_elements) {
-        for (auto iter = locations_available.begin(); iter != locations_available.end(); ++iter){
-            *iter = true;
-        }
+        using std::fill;
+        fill(locations_available.begin(), locations_available.end(), true);
     } else {
         locations_available.reserve(max_board_elements);
         for (auto i = 0; i < max_board_elements; ++i) {

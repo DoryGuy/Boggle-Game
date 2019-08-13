@@ -12,11 +12,11 @@
 
     
 void WordDictionary::insertWord(std::string word) {
-    using std::transform;
-    transform(word.begin(), word.end(), word.begin(), ::tolower);
+    //using std::transform;
+    //transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto hashKey = hashTheWord(word);
-    auto words = dictionary[hashKey];
-    words.emplace(std::move(word));
+    auto words{std::move(dictionary[hashKey])};
+    words.insert(std::move(word));
     dictionary[hashKey] = words;
 }
 
@@ -29,33 +29,101 @@ unsigned long WordDictionary::hashTheWord(std::string word) const {
 
 WordDictionary::WordDictionary() {
     // fill it with words...
-    insertWord("test");
-    insertWord("foo");
-    insertWord("bar");
-    insertWord("mom");
-    insertWord("quit");
-    insertWord("form");
-    insertWord("for");
-    insertWord("omit");
-    insertWord("data");
-    insertWord("teat");
-    insertWord("fort");
-    insertWord("tat");
-    insertWord("atom");
-    insertWord("ate");
-    insertWord("Storm");
-    insertWord("dart");
-    insertWord("tart");
-    insertWord("tar");
-    insertWord("fart");
-    insertWord("farm");
-    insertWord("far");
-    insertWord("rat");
-    insertWord("sat");
-    insertWord("dorm");
-    insertWord("mat");
-    insertWord("quit");
-    insertWord("quite");
+    
+    std::string wordList[] = {
+     "test"
+    ,"arm"
+    ,"art"
+    ,"ate"
+    ,"atom"
+    ,"bar"
+    ,"dart"
+    ,"darts"
+    ,"data"
+    ,"date"
+    ,"dates"
+    ,"doom"
+    ,"door"
+    ,"dorm"
+    ,"dote"
+    ,"eat"
+    ,"eats"
+    ,"east"
+    ,"fade"
+    ,"far"
+    ,"farm"
+    ,"fart"
+    ,"farts"
+    ,"fate"
+    ,"fates"
+    ,"fast"
+    ,"foo"
+    ,"food"
+    ,"foot"
+    ,"for"
+    ,"form"
+    ,"format"
+    ,"formats"
+    ,"formatted"
+    ,"fort"
+    ,"forts"
+    ,"mat"
+    ,"mate"
+    ,"mated"
+    ,"matted"
+    ,"mats"
+    ,"moat"
+    ,"moats"
+    ,"mode"
+    ,"modes"
+    ,"mom"
+    ,"moot"
+    ,"motar"
+    ,"ode"
+    ,"off"
+    ,"omit"
+    ,"quit"
+    ,"quite"
+    ,"ram"
+    ,"ram"
+    ,"rat"
+    ,"rats"
+    ,"rate"
+    ,"rates"
+    ,"rim"
+    ,"road"
+    ,"rod"
+    ,"rode"
+    ,"roof"
+    ,"room"
+    ,"root"
+    ,"rooted"
+    ,"roots"
+    ,"rote"
+    ,"sat"
+    ,"sea"
+    ,"sear"
+    ,"seat"
+    ,"start"
+    ,"stat"
+    ,"state"
+    ,"stated"
+    ,"storm"
+    ,"tad"
+    ,"tar"
+    ,"tart"
+    ,"tat"
+    ,"tear"
+    ,"teat"
+    ,"tetra"
+    ,"too"
+    ,"tram"
+    ,"trim"
+    ,"trod"
+    };
+    for (auto& word: wordList) {
+        insertWord(std::move(word));
+    }
 }
 
 // check for both forward spelling and reverse spelling.
@@ -68,6 +136,9 @@ std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictiona
         if (iter != wordsListIter->second.end()) {
             return {FoundWord_t::Found,std::move(word)};
         }
+
+        // useful if we can figure out how to eliminate searching
+        // from every node position.
         reverse(word.begin(), word.end());
         iter = wordsListIter->second.find(word);
         if (iter != wordsListIter->second.end()) {

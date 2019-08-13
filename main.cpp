@@ -6,6 +6,7 @@
 //  Copyright © 2019 Guest User. All rights reserved.
 //
 
+#include <chrono>
 #include <iostream>
 
 #include <cassert>
@@ -15,7 +16,9 @@
 int main(int argc, const char * argv[]) {
     // insert code here...
     BoggleGame game;
-    
+  
+    if (false) // basic test cases.
+    {
     
     game.fill_board_for_testing("Qitexxxxxxxxxxxx"); // horizontal
     auto result = game.play_game();
@@ -109,20 +112,33 @@ int main(int argc, const char * argv[]) {
     }
     std::cout << std::endl;
     assert(result.size() == 1);
+ 
+    }
+    
     
     game.fill_board_for_testing("TestDataForMomit");
-    result = game.play_game();
+    auto now = std::chrono::high_resolution_clock::now();
+    auto result = game.play_game();
+    auto run_time = std::chrono::high_resolution_clock::now() - now;
+    std::cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(run_time).count()
+              << " milliseconds \n";
     std::cout << "Words Found = " << result.size() << "!\n";
     for (auto word: result) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
+    assert(result.size() == 79);
     
     game.fill_board_for_testing("TDFMeaoostrmtatt");
+    now = std::chrono::high_resolution_clock::now();
     result = game.play_game();
+    run_time = std::chrono::high_resolution_clock::now() - now;
+    std::cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(run_time).count()
+              << " millieconds \n";
     std::cout << "Words Found = " << result.size() << "!\n";
     for (auto word: result) {
         std::cout << word << std::endl;
     }
+    assert(result.size() == 71);
     return 0;
 }

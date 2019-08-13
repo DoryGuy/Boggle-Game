@@ -91,11 +91,13 @@ void BoggleGame::moveNextPostion(std::string currentWord, Location original_loca
         if ((location.*fn)() == Move_t::MOVE_SUCCESS) {
             //location.printLocation(); std::cout << std::endl;
             newWord += board[indexToMove(location.getRow(), location.getCol())];
-            checkWord(newWord);
-            // debug only look for <= 4 letter words.
-            //if (newWord.length() < 4 ) {
+            if (newWord.length() > 2) {
+                checkWord(newWord);
+            }
+            // debug only look for <= 9 letter words. (longest in our dictionary)
+            if (newWord.length() < 9 ) {
                 moveNextPostion(newWord, location);
-            //}
+            }
         }
     }
 }
@@ -107,7 +109,7 @@ std::set<std::string> BoggleGame::play_game(){
     using std::thread;
     
     vector<ThreadRAII> processes;
-    // preallocate some space
+    // preallocate enough space
     processes.reserve(numberOfColumnsInBoard*numberOfRowsInBoard);
     for (int row = 0; row < numberOfRowsInBoard; ++row) {
         for (int col = 0; col < numberOfColumnsInBoard; ++col) {
