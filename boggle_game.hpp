@@ -43,8 +43,9 @@ private:
     
 public:
     BoggleGame();
-    void init_board() ;
+    void init_board();
     void fill_board_for_testing(std::string testData);
+    int game_score() const;
 
     std::set<std::string> play_game();};
 

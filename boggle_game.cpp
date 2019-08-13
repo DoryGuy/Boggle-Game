@@ -33,7 +33,7 @@ BoggleGame::BoggleGame()
     moveFnPtrs.emplace_back(&Location::MoveDownRight);
     moveFnPtrs.emplace_back(&Location::MoveDownLeft);
     
-    dictionary.printDictionary(std::cout);
+    // dictionary.printDictionary(std::cout);
 }
     
 void BoggleGame::init_board() {
@@ -128,4 +128,39 @@ std::set<std::string> BoggleGame::play_game(){
         t.get().join();
     }
     return foundWords;
+}
+
+int scoreWord(std::string &word) {
+    int result = 0;
+    switch(word.length()) {
+        case 0:
+        case 1:
+        case 2:
+            result = 0;
+            break;
+        case 3:
+        case 4:
+            result = 1;
+            break;
+        case 5:
+            result = 2;
+            break;
+        case 6:
+            result = 3;
+            break;
+        case 7:
+            result = 5;
+            break;
+        default:
+            result = 11;
+    }
+    return result;
+}
+
+int BoggleGame::game_score() const {
+    int result = 0;
+    for (auto word: foundWords) {
+        result += scoreWord(word);
+    }
+    return result;
 }

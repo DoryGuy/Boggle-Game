@@ -9,26 +9,49 @@
 #include "word_dictionary.hpp"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
+// a hash for our dictionary.
+unsigned long hashTheWord(std::string const &word) {
+#ifdef REVERSE_SEARCH
+    using std::sort;
+    sort(word.begin(), word.end());
+#endif
+    return std::hash<std::string>{}(word);
+}
     
 void WordDictionary::insertWord(std::string word) {
-    //using std::transform;
-    //transform(word.begin(), word.end(), word.begin(), ::tolower);
+    using std::transform;
+    
+    // no point in using a dictionary with words that won't score.
+    if (word.length() < 3 || word.length() > 16) {
+        return;
+    }
+    transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto hashKey = hashTheWord(word);
     auto words{std::move(dictionary[hashKey])};
     words.insert(std::move(word));
     dictionary[hashKey] = words;
 }
 
-// a hash for our dictionary.
-unsigned long WordDictionary::hashTheWord(std::string word) const {
-    using std::sort;
-    sort(word.begin(), word.end());
-    return std::hash<std::string>{}(word);
-}
-
 WordDictionary::WordDictionary() {
     // fill it with words...
+    std::ifstream dictionaryFile;
+    dictionaryFile.open("/Users/garypowell/Desktop/QuizQuestions/Boggle-Game/Boggle-Game/dictionary-yawl.txt", std::ios::in);
+    std::string word;
+    if (dictionaryFile.is_open())
+    {
+        while (getline (dictionaryFile,word) )
+        {
+            insertWord(std::move(word));
+        }
+        dictionaryFile.close();
+        return;
+    }
+    
+    std::cout << "Unable to open file dictionary-yawl.txt" << std::endl;
+    std::cout << "using default dictionary" << std::endl;
+    
     
     std::string wordList[] = {
      "test"
@@ -137,6 +160,7 @@ std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictiona
             return {FoundWord_t::Found,std::move(word)};
         }
 
+#ifdef REVERSE_SEARCH
         // useful if we can figure out how to eliminate searching
         // from every node position.
         reverse(word.begin(), word.end());
@@ -144,6 +168,7 @@ std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictiona
         if (iter != wordsListIter->second.end()) {
             return {FoundWord_t::Found,std::move(word)};
         }
+#endif // REVERSE_SEARCH
     }
     return {FoundWord_t::NotFound,{}};
 }

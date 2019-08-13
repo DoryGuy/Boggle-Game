@@ -17,7 +17,7 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     BoggleGame game;
   
-    if (false) // basic test cases.
+    if (true) // basic test cases.
     {
     
     game.fill_board_for_testing("Qitexxxxxxxxxxxx"); // horizontal
@@ -26,7 +26,7 @@ int main(int argc, const char * argv[]) {
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 2);
+    assert(result.size() == 3);
     
     game.fill_board_for_testing("Testxxxxxxxxxxxx"); // horizontal
     result = game.play_game();
@@ -34,7 +34,7 @@ int main(int argc, const char * argv[]) {
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("TseTxxxxxxxxxxxx"); // horizontal reversed
     result = game.play_game();
@@ -42,14 +42,14 @@ int main(int argc, const char * argv[]) {
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("Txxxxexxxxsxxxxt"); // diagonal
     std::cout << "Diagonal Words Found = " << result.size() << "!\n";
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("txxxxsxxxxexxxxT"); // diagonal reversed
     std::cout << "Diagonal reversed Words Found = " << result.size() << "!\n";
@@ -57,7 +57,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("Txxxexxxsxxxtxxx"); // vertical
     result = game.play_game();
@@ -66,7 +66,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("txxxsxxxexxxTxxx"); // vertical reversed
     result = game.play_game();
@@ -75,7 +75,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 8);
     
     game.fill_board_for_testing("Ttxxesxxxxxxxxxx"); // quad
     result = game.play_game();
@@ -84,7 +84,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 9);
     
     game.fill_board_for_testing("tTxxsexxxxxxxxxx"); // quad reversed
     result = game.play_game();
@@ -93,7 +93,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 12);
     
     game.fill_board_for_testing("Texxstxxxxxxxxxx"); // Z
     result = game.play_game();
@@ -102,7 +102,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 12);
     
     game.fill_board_for_testing("tsxxeTxxxxxxxxxx"); // Z reversed
     result = game.play_game();
@@ -111,7 +111,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 1);
+    assert(result.size() == 12);
  
     }
     
@@ -127,7 +127,7 @@ int main(int argc, const char * argv[]) {
         std::cout << word << std::endl;
     }
     std::cout << std::endl;
-    assert(result.size() == 79);
+    assert(result.size() == 379);
     
     game.fill_board_for_testing("TDFMeaoostrmtatt");
     now = std::chrono::high_resolution_clock::now();
@@ -139,6 +139,6 @@ int main(int argc, const char * argv[]) {
     for (auto word: result) {
         std::cout << word << std::endl;
     }
-    assert(result.size() == 71);
+    assert(result.size() == 304);
     return 0;
 }
