@@ -17,11 +17,19 @@ unsigned long hashTheWord(std::string const &word) {
     using std::sort;
     sort(word.begin(), word.end());
 #endif
-    return std::hash<std::string>{}(word);
+    std::string leadingChars;
+    // I'm not going to check the minimum length of the word here, as we do that
+    // before this fn is called.
+    leadingChars += word[0];
+    leadingChars += word[1];
+    leadingChars += word[2];
+    return std::hash<std::string>{}(leadingChars);
 }
     
 void WordDictionary::insertWord(std::string word) {
     using std::transform;
+    using std::string;
+    //using std::make_unique;
     
     // no point in using a dictionary with words that won't score.
     if (word.length() < 3 || word.length() > 16) {
@@ -29,9 +37,19 @@ void WordDictionary::insertWord(std::string word) {
     }
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto hashKey = hashTheWord(word);
-    auto words{std::move(dictionary[hashKey])};
-    words.insert(std::move(word));
-    dictionary[hashKey] = words;
+    auto iter = dictionary.find(hashKey);
+    
+    if (iter == dictionary.end()) {
+        using std::set;
+        //auto words = std::make_unique<set<string>>>(new set<string>);
+        auto words_ptr = std::unique_ptr<set<string>>(new set<string>);
+        words_ptr->insert(std::move(word));
+        dictionary[hashKey] = std::move(words_ptr);
+    }
+    else {
+        auto words_ptr = iter->second.get();
+        words_ptr->insert(std::move(word));
+    }
 }
 
 WordDictionary::WordDictionary() {
@@ -150,14 +168,17 @@ WordDictionary::WordDictionary() {
 }
 
 // check for both forward spelling and reverse spelling.
-std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictionary(std::string word) const {
+std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string> WordDictionary::isInDictionary(std::string word) const {
     using std::reverse;
     
     auto wordsListIter = dictionary.find(hashTheWord(word));
     if (wordsListIter != dictionary.end()) {
-        auto iter = wordsListIter->second.find(word);
-        if (iter != wordsListIter->second.end()) {
-            return {FoundWord_t::Found,std::move(word)};
+        auto iter = wordsListIter->second->find(word);
+        if (iter != wordsListIter->second->end()) {
+            return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+        }
+        else {
+            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
         }
 
 #ifdef REVERSE_SEARCH
@@ -166,19 +187,23 @@ std::pair<WordDictionary::FoundWord_t, std::string> WordDictionary::isInDictiona
         reverse(word.begin(), word.end());
         iter = wordsListIter->second.find(word);
         if (iter != wordsListIter->second.end()) {
-            return {FoundWord_t::Found,std::move(word)};
+            return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+        } else {
+            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});    
         }
 #endif // REVERSE_SEARCH
     }
-    return {FoundWord_t::NotFound,{}};
+    return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
 }
 
 void WordDictionary::printDictionary(std::ostream &os) const {
     os << "Dictionary contains: " << dictionary.size() << " words " << std::endl;
-    for (auto wordList: dictionary) {
-        for (auto word : wordList.second) {
+#ifdef DEBUG_DICTIONARY
+    for (auto &wordList: dictionary) {
+        for (auto word : *wordList.second) {
             std::cout << word << std::endl;
         }
     }
     os << "----------" << std::endl;
+#endif
 }

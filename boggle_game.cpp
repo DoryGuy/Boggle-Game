@@ -33,7 +33,7 @@ BoggleGame::BoggleGame()
     moveFnPtrs.emplace_back(&Location::MoveDownRight);
     moveFnPtrs.emplace_back(&Location::MoveDownLeft);
     
-    // dictionary.printDictionary(std::cout);
+    dictionary.printDictionary(std::cout);
 }
     
 void BoggleGame::init_board() {
@@ -71,32 +71,36 @@ void BoggleGame::fill_board_for_testing(std::string testData)
     }
 }
     
-void BoggleGame::checkWord(std::string word) {
+BoggleGame::KeepTrying_t BoggleGame::checkWord(std::string word) {
     using std::transform;
+    using std::get;
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto result = dictionary.isInDictionary(word);
-    if (result.first == WordDictionary::FoundWord_t::Found) {
+    if (get<0>(result) == WordDictionary::FoundWord_t::Found) {
         std::lock_guard<std::mutex> lockFoundWords(foundWordsMutex);
-        std::cout << " Found " << result.second << std::endl;
-        foundWords.insert(std::move(result.second));
+#ifdef DEBUG_SEARCH
+        std::cout << " Found " << get<2>(result) << std::endl;
+#endif
+        foundWords.insert(std::move(get<2>(result)));
     }
+    return get<1>(result) == WordDictionary::LeadingPrefixFound_t::Found ?
+           BoggleGame::KeepTrying_t::keepGoing : BoggleGame::KeepTrying_t::stop;
 }
-    
+
 // called recursively until all directions are tried
 // and while it's possible to move.
 void BoggleGame::moveNextPostion(std::string currentWord, Location original_location) {
     for (auto fn: moveFnPtrs) {
         Location location(original_location);
         std::string newWord(currentWord);
+        KeepTrying_t keepOnTrucking = KeepTrying_t::keepGoing;
         if ((location.*fn)() == Move_t::MOVE_SUCCESS) {
             //location.printLocation(); std::cout << std::endl;
             newWord += board[indexToMove(location.getRow(), location.getCol())];
             if (newWord.length() > 2) {
-                checkWord(newWord);
-            }
-            // debug only look for <= 9 letter words. (longest in our dictionary)
-            if (newWord.length() < 9 ) {
-                moveNextPostion(newWord, location);
+                keepOnTrucking = checkWord(newWord);            }
+            if (keepOnTrucking == KeepTrying_t::keepGoing) {
+                moveNextPostion(std::move(newWord), std::move(location));
             }
         }
     }
@@ -120,7 +124,6 @@ std::set<std::string> BoggleGame::play_game(){
                 moveNextPostion(currentWord, location);
             };
             processes.emplace_back(ThreadRAII(thread(moveFn), ThreadRAII::DtorAction::join));
-            //moveFn();
         }
     }
     

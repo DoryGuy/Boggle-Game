@@ -30,6 +30,9 @@ public:
         init_board();
     }
     
+    Location(Location &&) = default;
+    Location(Location const &) = default;
+    
     int getRow() const { return row; }
     int getCol() const { return col; }
     

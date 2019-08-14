@@ -9,24 +9,26 @@
 #ifndef dictionary_hpp
 #define dictionary_hpp
 
+#include <memory>
 #include <ostream>
 #include <set>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 
 
 class WordDictionary {
 private:
-    std::unordered_map<unsigned long, std::set<std::string>> dictionary;
+    std::unordered_map<unsigned long, std::unique_ptr<std::set<std::string>>> dictionary;
     
     void insertWord(std::string word);
-    // a hash for our dictionary.
-    unsigned long hashTheWord(std::string word) const;
 public:
     enum class FoundWord_t { Found, NotFound };
+    enum class LeadingPrefixFound_t { Found, NotFound };
+    
     WordDictionary();
     // check for both forward spelling and reverse spelling.
-    std::pair<FoundWord_t,std::string> isInDictionary(std::string word) const;
+    std::tuple<FoundWord_t, LeadingPrefixFound_t, std::string> isInDictionary(std::string word) const;
     void printDictionary(std::ostream &os) const;
 };
 #endif /* dictionary_hpp */

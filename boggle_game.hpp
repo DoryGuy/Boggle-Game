@@ -28,6 +28,8 @@ private:
     // maybe later use a more generic fn pointer here.
     using MoveFunctionPtr_t = Move_t (Location::*)();
     
+    enum class KeepTrying_t { keepGoing, stop };
+    
     BoggleBoard_t board;
     std::vector<MoveFunctionPtr_t> moveFnPtrs;
     std::string currentWord;
@@ -36,7 +38,7 @@ private:
     std::mutex foundWordsMutex;
     std::set<std::string> foundWords;
     
-    void checkWord(std::string word);
+    KeepTrying_t checkWord(std::string word);
     // called recursively until all directions are tried
     // and while it's possible to move.
     void moveNextPostion(std::string currentWord, Location original_location);
