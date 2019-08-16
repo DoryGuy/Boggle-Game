@@ -55,7 +55,7 @@ void BoggleGame::init_board() {
     }
 }
     
-void BoggleGame::fill_board_for_testing(std::string testData)
+void BoggleGame::fill_board_for_testing(std::string const &testData)
 {
     using std::string;
     board.clear();
@@ -88,7 +88,7 @@ BoggleGame::KeepTrying_t BoggleGame::checkWord(std::string word) {
 }
 
 // called recursively until all directions are tried
-// and while it's possible to move.
+// and while it's possible to move, and find a new word.
 void BoggleGame::moveNextPostion(std::string currentWord, Location original_location) {
     for (auto fn: moveFnPtrs) {
         Location location(original_location);
@@ -96,7 +96,7 @@ void BoggleGame::moveNextPostion(std::string currentWord, Location original_loca
         KeepTrying_t keepOnTrucking = KeepTrying_t::keepGoing;
         if ((location.*fn)() == Move_t::MOVE_SUCCESS) {
             //location.printLocation(); std::cout << std::endl;
-            newWord += board[indexToMove(location.getRow(), location.getCol())];
+            newWord += board[indexInBoard(location.getRow(), location.getCol())];
             if (newWord.length() > 2) {
                 keepOnTrucking = checkWord(newWord);            }
             if (keepOnTrucking == KeepTrying_t::keepGoing) {
@@ -112,6 +112,7 @@ std::set<std::string> BoggleGame::play_game(){
     using std::vector;
     using std::thread;
     
+    // we are going to use one process for each location on the board.
     vector<ThreadRAII> processes;
     // preallocate enough space
     processes.reserve(numberOfColumnsInBoard*numberOfRowsInBoard);
@@ -119,7 +120,7 @@ std::set<std::string> BoggleGame::play_game(){
         for (int col = 0; col < numberOfColumnsInBoard; ++col) {
             string currentWord;
             Location location(row, col);
-            currentWord += board[indexToMove(row,col)]; // start word at this location.
+            currentWord += board[indexInBoard(row,col)]; // start word at this location.
             auto moveFn = [&,location=std::move(location),currentWord=std::move(currentWord)]() -> void {
                 moveNextPostion(currentWord, location);
             };
@@ -160,10 +161,28 @@ int scoreWord(std::string &word) {
     return result;
 }
 
-int BoggleGame::game_score() const {
+int BoggleGame::score() const {
     int result = 0;
     for (auto word: foundWords) {
         result += scoreWord(word);
     }
     return result;
+}
+
+std::ostream &BoggleGame::printTheBoard(std::ostream &os) {
+    
+    for (int row = 0; row < numberOfRowsInBoard; ++row) {
+        for (int col = 0; col < numberOfColumnsInBoard; ++col) {
+            auto c = board[indexInBoard(row, col)];
+            os << c;
+            if (c.length() == 2 ) {
+                os << " ";
+            } else {
+                os << "  ";
+            }
+        }
+        os << "\n";
+    }
+    
+    return os;
 }

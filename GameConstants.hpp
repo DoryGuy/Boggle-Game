@@ -12,7 +12,7 @@
 constexpr int numberOfColumnsInBoard = 4;
 constexpr int numberOfRowsInBoard = 4;
 
-inline int indexToMove(int row, int column) {
+inline int indexInBoard(int row, int column) {
     // debug check row < numberOfColumns && column < numberOfColums
     return (numberOfColumnsInBoard * row) + column;
 }

@@ -7,32 +7,38 @@
 //
 
 #include "word_dictionary.hpp"
+#include "GameConstants.hpp"
 #include <algorithm>
 #include <iostream>
 #include <fstream>
 
+//#define REVERSE_SEARCH 1
+
 // a hash for our dictionary.
-unsigned long hashTheWord(std::string const &word) {
 #ifdef REVERSE_SEARCH
+unsigned long hashTheWord(std::string word) {
     using std::sort;
     sort(word.begin(), word.end());
-#endif
+
     std::string leadingChars;
     // I'm not going to check the minimum length of the word here, as we do that
     // before this fn is called.
-    leadingChars += word[0];
-    leadingChars += word[1];
-    leadingChars += word[2];
-    return std::hash<std::string>{}(leadingChars);
+    return std::hash<std::string>{}(word.substr(0,3));
 }
+#else
+// return just the first three letters of the word.
+inline std::string hashTheWord(std::string word) {
+    return word.substr(0, 3);
+}
+#endif
     
 void WordDictionary::insertWord(std::string word) {
     using std::transform;
     using std::string;
     //using std::make_unique;
     
-    // no point in using a dictionary with words that won't score.
-    if (word.length() < 3 || word.length() > 16) {
+    // no point in having a dictionary with words that won't score.
+    if (word.length() < 3 || word.length() > max_board_elements) {
         return;
     }
     transform(word.begin(), word.end(), word.begin(), ::tolower);
@@ -41,7 +47,6 @@ void WordDictionary::insertWord(std::string word) {
     
     if (iter == dictionary.end()) {
         using std::set;
-        //auto words = std::make_unique<set<string>>>(new set<string>);
         auto words_ptr = std::unique_ptr<set<string>>(new set<string>);
         words_ptr->insert(std::move(word));
         dictionary[hashKey] = std::move(words_ptr);
@@ -171,33 +176,37 @@ WordDictionary::WordDictionary() {
 std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string> WordDictionary::isInDictionary(std::string word) const {
     using std::reverse;
     
-    auto wordsListIter = dictionary.find(hashTheWord(word));
+    auto hashkey = hashTheWord(word);
+    auto wordsListIter = dictionary.find(hashTheWord(hashkey));
     if (wordsListIter != dictionary.end()) {
         auto iter = wordsListIter->second->find(word);
         if (iter != wordsListIter->second->end()) {
             return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
         }
-        else {
-            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
-        }
-
+        
 #ifdef REVERSE_SEARCH
         // useful if we can figure out how to eliminate searching
         // from every node position.
         reverse(word.begin(), word.end());
-        iter = wordsListIter->second.find(word);
-        if (iter != wordsListIter->second.end()) {
+        iter = wordsListIter->second->find(word);
+        if (iter != wordsListIter->second->end()) {
             return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
-        } else {
-            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});    
         }
 #endif // REVERSE_SEARCH
+        
+        return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
+
     }
     return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
 }
 
 void WordDictionary::printDictionary(std::ostream &os) const {
-    os << "Dictionary contains: " << dictionary.size() << " words " << std::endl;
+    os << "Dictionary contains: " << dictionary.size() << " tri's " << std::endl;
+    int wordCount = 0;
+    for (auto &wordList: dictionary) {
+        wordCount += wordList.second->size();
+    }
+    os << "Dictionary contains: " << wordCount << " words " << std::endl;
 #ifdef DEBUG_DICTIONARY
     for (auto &wordList: dictionary) {
         for (auto word : *wordList.second) {

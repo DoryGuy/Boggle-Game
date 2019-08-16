@@ -28,6 +28,7 @@ private:
     // maybe later use a more generic fn pointer here.
     using MoveFunctionPtr_t = Move_t (Location::*)();
     
+    // indicator that there are no more possible words following this path.
     enum class KeepTrying_t { keepGoing, stop };
     
     BoggleBoard_t board;
@@ -46,10 +47,10 @@ private:
 public:
     BoggleGame();
     void init_board();
-    void fill_board_for_testing(std::string testData);
-    int game_score() const;
+    void fill_board_for_testing(std::string const &testData);
+    int score() const;
+    std::ostream &printTheBoard(std::ostream &);
 
-    std::set<std::string> play_game();};
-
-
+    std::set<std::string> play_game();
+};
 #endif /* boggle_game_hpp */

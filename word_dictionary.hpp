@@ -19,7 +19,7 @@
 
 class WordDictionary {
 private:
-    std::unordered_map<unsigned long, std::unique_ptr<std::set<std::string>>> dictionary;
+    std::unordered_map<std::string, std::unique_ptr<std::set<std::string>>> dictionary;
     
     void insertWord(std::string word);
 public:
