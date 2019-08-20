@@ -45,12 +45,30 @@ private:
     KeyWord_t m_keyWord;
 };
 
+class setWithMaxLength : public std::set<std::string>
+{
+public:
+    setWithMaxLength()
+    : m_max_length(0)
+    {}
+    
+    void newLength(size_t x) {
+        if (x > m_max_length ) {
+            m_max_length = x;
+        }
+    }
+    
+    size_t getMaxLength() const { return m_max_length;}
+private:
+    size_t m_max_length;
+};
+
 
 
 class WordDictionary {
 private:
     using subDictionaryKeywordChar_t = subDictionaryKeyword<char>;
-    using InnerDictionarySetPtr_t = std::unique_ptr<std::set<std::string>>;
+    using InnerDictionarySetPtr_t = std::unique_ptr<setWithMaxLength>;
     using InnerDictionary_t = std::unordered_map<subDictionaryKeywordChar_t, InnerDictionarySetPtr_t,subDictionaryKeywordChar_t, subDictionaryKeywordChar_t>;
     
     using InnerDictionaryPtr_t = std::unique_ptr<InnerDictionary_t>;

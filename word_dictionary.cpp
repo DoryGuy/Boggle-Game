@@ -53,14 +53,15 @@ void WordDictionary::insertWord(std::string word) {
         if (word.length() == 3) {
             dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
         } else if (word.length() == 4) {
-            auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+            auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
             subDictionaryKeyword<char> innerKeyword(isWord_t::yes, word[3]);
             inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
             dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
         } else {
-            auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+            auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
             subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
-            words_ptr->insert(word.substr(4,word.length()));
+            words_ptr->emplace(word.substr(4,word.length()));
+            words_ptr->newLength(word.length());
             inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
             dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
         }
@@ -76,7 +77,7 @@ void WordDictionary::insertWord(std::string word) {
             auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
             if (inner_dictionary_iter == four_letter_words_ptr->end()) {
                 // the four letter word isn't here.
-                auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+                auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
                 four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
 
             } else {
@@ -92,14 +93,16 @@ void WordDictionary::insertWord(std::string word) {
             if (inner_dictionary_iter == four_letter_words_ptr->end()) {
                 // the four letter word isn't here.
                 subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
-                auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+                auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
                 words_ptr->emplace(word.substr(4, word.length()));
+                words_ptr->newLength(word.length());
                 four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
             } else {
                 auto words_ptr = inner_dictionary_iter->second.get();
                 auto stored_word = word.substr(4, word.length());
                 if (words_ptr->end() == words_ptr->find(stored_word)) {
                     words_ptr->emplace(std::move(stored_word));
+                    words_ptr->newLength(word.length());
                 }
             }
         }
@@ -253,6 +256,14 @@ WordDictionary::isInDictionary(std::string word) const {
             auto set_iter = inner_dictionary_iter->second->find(endOfWord);
             if (set_iter != inner_dictionary_iter->second->end()) {
                 return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+            }
+            
+            size_t max_wordLenth_in_set(inner_dictionary_iter->second->getMaxLength());
+            
+            if (max_wordLenth_in_set <= word.length()) {
+                // there is no chance that any other word with this prefix will be found.
+                // as it's longer than any known word with this prefix
+                return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
             }
         
             return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
