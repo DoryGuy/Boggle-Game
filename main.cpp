@@ -42,7 +42,7 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     BoggleGame game;
   
-    if (false) // basic test cases.
+    if (true) // basic test cases.
     {
         runTest(game, "horizontal Q", "Qitexxxxxxxxxxxx", 3);
 
@@ -67,9 +67,9 @@ int main(int argc, const char * argv[]) {
         runTest(game, "Z pattern reversed", "tsxxeTxxxxxxxxxx", 12);
     }
     
-    //runTest(game, "Just some test data", "TestDataForMomit", 379);
+    runTest(game, "Just some test data", "TestDataForMomit", 379);
     
-    //runTest(game, "Just some test data vertical", "TDFMeaoostrmtatt", 304);
+    runTest(game, "Just some test data vertical", "TDFMeaoostrmtatt", 304);
     
     runTest(game, "Best known board", "GNESSRIPETALTSEB", 1351);
 

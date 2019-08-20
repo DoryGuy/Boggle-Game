@@ -12,48 +12,97 @@
 #include <iostream>
 #include <fstream>
 
+
+//subDictionaryKeyword<std::string> foo1;
+//subDictionaryKeyword<char> foo2;
+
 //#define REVERSE_SEARCH 1
 
 // a hash for our dictionary.
-#ifdef REVERSE_SEARCH
-unsigned long hashTheWord(std::string word) {
-    using std::sort;
-    sort(word.begin(), word.end());
+// specializations for the hash of the two types we are using, char and std::string
+template<>
+size_t subDictionaryKeyword<char>::operator()(const subDictionaryKeyword<char>& k) const { return static_cast<size_t>(k.keyWord()); }
 
-    std::string leadingChars;
-    // I'm not going to check the minimum length of the word here, as we do that
-    // before this fn is called.
-    return std::hash<std::string>{}(word.substr(0,3));
-}
-#else
+template<>
+size_t subDictionaryKeyword<std::string>::operator()(const subDictionaryKeyword<std::string>& k) const { return std::hash<std::string>{}(k.keyWord()); }
+
 // return just the first three letters of the word.
-inline std::string hashTheWord(std::string word) {
-    return word.substr(0, 3);
+subDictionaryKeyword<std::string> hashTheWord(std::string word) {
+    auto isWord = word.length() == 3 ? isWord_t::yes : isWord_t::no;
+    return subDictionaryKeyword<std::string>(isWord, word.substr(0, 3));
 }
-#endif
-    
+
 void WordDictionary::insertWord(std::string word) {
     using std::transform;
     using std::string;
-    //using std::make_unique;
-    
+    using std::unique_ptr;
+    using std::set;
+
     // no point in having a dictionary with words that won't score.
     if (word.length() < 3 || word.length() > max_board_elements) {
         return;
     }
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto hashKey = hashTheWord(word);
-    auto iter = dictionary.find(hashKey);
+    auto triIter = dictionary.find(hashKey);
     
-    if (iter == dictionary.end()) {
+    if (triIter == dictionary.end()) {
         using std::set;
-        auto words_ptr = std::unique_ptr<set<string>>(new set<string>);
-        words_ptr->insert(std::move(word));
-        dictionary[hashKey] = std::move(words_ptr);
+        auto inner_dictionary_ptr = InnerDictionaryPtr_t(new InnerDictionary_t);
+        
+        if (word.length() == 3) {
+            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
+        } else if (word.length() == 4) {
+            auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+            subDictionaryKeyword<char> innerKeyword(isWord_t::yes, word[3]);
+            inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
+            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
+        } else {
+            auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+            subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
+            words_ptr->insert(word.substr(4,word.length()));
+            inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
+            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
+        }
     }
     else {
-        auto words_ptr = iter->second.get();
-        words_ptr->insert(std::move(word));
+        if (word.length() == 3) {
+            if (triIter->first.isWord() == isWord_t::no) {
+                triIter->first.setIsWord();
+            }
+        } else if (word.length() == 4) {
+            auto four_letter_words_ptr = triIter->second.get();
+            subDictionaryKeyword<char> innerKeyword(isWord_t::yes, word[3]);
+            auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
+            if (inner_dictionary_iter == four_letter_words_ptr->end()) {
+                // the four letter word isn't here.
+                auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+                four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
+
+            } else {
+                if (inner_dictionary_iter->first.isWord() == isWord_t::no)
+                {
+                    inner_dictionary_iter->first.setIsWord();
+                }
+            }
+        } else {
+            auto four_letter_words_ptr = triIter->second.get();
+            subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
+            auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
+            if (inner_dictionary_iter == four_letter_words_ptr->end()) {
+                // the four letter word isn't here.
+                subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
+                auto words_ptr = InnerDictionarySetPtr_t(new set<string>);
+                words_ptr->emplace(word.substr(4, word.length()));
+                four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
+            } else {
+                auto words_ptr = inner_dictionary_iter->second.get();
+                auto stored_word = word.substr(4, word.length());
+                if (words_ptr->end() == words_ptr->find(stored_word)) {
+                    words_ptr->emplace(std::move(stored_word));
+                }
+            }
+        }
     }
 }
 
@@ -173,46 +222,84 @@ WordDictionary::WordDictionary() {
 }
 
 // check for both forward spelling and reverse spelling.
-std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string> WordDictionary::isInDictionary(std::string word) const {
+std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>
+WordDictionary::isInDictionary(std::string word) const {
     using std::reverse;
-    
+
     auto hashkey = hashTheWord(word);
-    auto wordsListIter = dictionary.find(hashTheWord(hashkey));
-    if (wordsListIter != dictionary.end()) {
-        auto iter = wordsListIter->second->find(word);
-        if (iter != wordsListIter->second->end()) {
-            return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+    auto triIter = dictionary.find(hashkey);
+    if (triIter != dictionary.end()) {
+        if (word.length() == 3) {
+            if (triIter->first.isWord()) {
+            // 3 letter word found.
+                return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+            }
+            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::Found,{});
         }
         
-#ifdef REVERSE_SEARCH
-        // useful if we can figure out how to eliminate searching
-        // from every node position.
-        reverse(word.begin(), word.end());
-        iter = wordsListIter->second->find(word);
-        if (iter != wordsListIter->second->end()) {
-            return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
-        }
-#endif // REVERSE_SEARCH
+        subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
+        auto four_letter_words_ptr = triIter->second.get();
+        auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
+        if (inner_dictionary_iter != four_letter_words_ptr->end()) {
+            if (word.length() == 4) {
+                if (inner_dictionary_iter->first.isWord()) {
+                    return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+                }
+                
+                return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::Found,{});
+            }
+            
+            auto endOfWord = word.substr(4,word.length());
+            auto set_iter = inner_dictionary_iter->second->find(endOfWord);
+            if (set_iter != inner_dictionary_iter->second->end()) {
+                return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+            }
         
-        return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
+            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
+        }
 
     }
+
     return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
 }
 
 void WordDictionary::printDictionary(std::ostream &os) const {
-    os << "Dictionary contains: " << dictionary.size() << " tri's " << std::endl;
+    using std::endl;
+
     int wordCount = 0;
-    for (auto &wordList: dictionary) {
-        wordCount += wordList.second->size();
-    }
-    os << "Dictionary contains: " << wordCount << " words " << std::endl;
-#ifdef DEBUG_DICTIONARY
-    for (auto &wordList: dictionary) {
-        for (auto word : *wordList.second) {
-            std::cout << word << std::endl;
+    os << "Dictionary contains: " << dictionary.size() << " tri's " << endl;
+    int quadCount = 0;
+    for (auto &triList: dictionary) {
+        if (triList.first.isWord()) {
+            ++wordCount;
+        }
+        quadCount += triList.second->size();
+        for (auto &wordList: *triList.second.get()) {
+            if (wordList.first.isWord()) {
+                ++wordCount;
+            }
+            wordCount += wordList.second->size();
         }
     }
-    os << "----------" << std::endl;
+    os << "Dictionary contains: " << quadCount << " quad's " << endl;
+
+    os << "Dictionary contains: " << wordCount << " words " << endl;
+
+#ifdef DEBUG_DICTIONARY
+    for (auto &triList: dictionary) {
+        if (triList.first.isWord()) {
+            os << triList.first.keyWord() << endl;
+        }
+        for (auto &wordList: *triList.second.get()) {
+            if (wordList.first.isWord()) {
+                os << triList.first.keyWord() << wordList.first.keyWord() << endl;
+            }
+            for (auto &word: *wordList.second.get()) {
+                os << triList.first.keyWord() << wordList.first.keyWord() << word << endl;
+            }
+
+        }
+    }
+    os << "----------" << endl;
 #endif
 }

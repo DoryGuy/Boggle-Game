@@ -16,10 +16,48 @@
 #include <tuple>
 #include <unordered_map>
 
+enum isWord_t { no, yes};
+
+template<typename KeyWord_t>
+class subDictionaryKeyword {
+public:
+    subDictionaryKeyword(isWord_t isWord = isWord_t::no, KeyWord_t keyWord = {})
+    : m_isWord(isWord)
+    , m_keyWord(keyWord)
+    {}
+    
+    subDictionaryKeyword(subDictionaryKeyword const & rhs) = default;
+    subDictionaryKeyword(subDictionaryKeyword &&) = default;
+    subDictionaryKeyword & operator=(subDictionaryKeyword &&) = default;
+    subDictionaryKeyword & operator=(subDictionaryKeyword const &) = default;
+    
+    isWord_t isWord() const { return m_isWord;}
+    void setIsWord() const { m_isWord = yes; };
+    KeyWord_t const & keyWord() const { return m_keyWord; }
+    // hash fn
+    size_t operator()(const subDictionaryKeyword& k) const;
+    // comparison fn as the compiler can't seem to find operator()==
+    bool operator()(const subDictionaryKeyword& lhs, const subDictionaryKeyword& rhs) const
+        { return lhs == rhs; }
+    bool operator==(subDictionaryKeyword const &rhs) const { return m_keyWord == rhs.m_keyWord; }
+private:
+    mutable isWord_t m_isWord; // doesn't change the hash value or the comparison fn result.
+    KeyWord_t m_keyWord;
+};
+
+
 
 class WordDictionary {
 private:
-    std::unordered_map<std::string, std::unique_ptr<std::set<std::string>>> dictionary;
+    using subDictionaryKeywordChar_t = subDictionaryKeyword<char>;
+    using InnerDictionarySetPtr_t = std::unique_ptr<std::set<std::string>>;
+    using InnerDictionary_t = std::unordered_map<subDictionaryKeywordChar_t, InnerDictionarySetPtr_t,subDictionaryKeywordChar_t, subDictionaryKeywordChar_t>;
+    
+    using InnerDictionaryPtr_t = std::unique_ptr<InnerDictionary_t>;
+    using subDictionaryKeywordString_t = subDictionaryKeyword<std::string>;
+    using Dictionary_t = std::unordered_map<subDictionaryKeywordString_t, InnerDictionaryPtr_t, subDictionaryKeywordString_t,subDictionaryKeywordString_t>;
+ 
+    Dictionary_t dictionary;
     
     void insertWord(std::string word);
 public:
