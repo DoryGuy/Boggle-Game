@@ -82,7 +82,7 @@ Move_t Location::MoveUpRight() {
     if (row > 0) {
         auto new_col = col + 1;
         if (new_col < numberOfColumnsInBoard) {
-            int index(indexInBoard(--row, new_col));
+            auto index(indexInBoard(--row, new_col));
             if (locations_available[index]) {
                 col = new_col;
                 locations_available[index] = false;

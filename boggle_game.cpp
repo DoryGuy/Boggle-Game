@@ -18,8 +18,6 @@
 
 // the real game has a "Qu" so we need to store two letters, or always just insert "u" when we see "Q".
 
-
-
 BoggleGame::BoggleGame()
 {
     init_board();
@@ -117,7 +115,7 @@ std::set<std::string> BoggleGame::play_game(){
     // preallocate enough space
     processes.reserve(numberOfColumnsInBoard*numberOfRowsInBoard);
     for (int row = 0; row < numberOfRowsInBoard; ++row) {
-        for (int col = 0; col < numberOfColumnsInBoard; ++col) {
+        for (int col = 0; col < numberOfColumnsInBoard ; ++col) {
             string currentWord;
             Location location(row, col);
             currentWord += board[indexInBoard(row,col)]; // start word at this location.

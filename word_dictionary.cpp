@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 
 //subDictionaryKeyword<std::string> foo1;
@@ -48,22 +49,45 @@ void WordDictionary::insertWord(std::string word) {
     
     if (triIter == dictionary.end()) {
         using std::set;
-        auto inner_dictionary_ptr = InnerDictionaryPtr_t(new InnerDictionary_t);
+        auto quad_dictionary_ptr = QuadInnerDictionaryPtr_t(new QuadInnerDictionary_t);
         
         if (word.length() == 3) {
-            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
+            dictionary.emplace(std::move(hashKey), std::move(quad_dictionary_ptr));
         } else if (word.length() == 4) {
+            auto quintDictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::yes, word[3]);
+            // connect the quad dictionary to the empty quint dictionary
+            quad_dictionary_ptr->emplace(std::move(quadInnerKeyword), std::move(quintDictionary_ptr));
+            
+            // connect the tri dictionary to the quad dictionary
+            dictionary.emplace(std::move(hashKey), std::move(quad_dictionary_ptr));
+        } else if (word.length() == 5) {
             auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
-            subDictionaryKeyword<char> innerKeyword(isWord_t::yes, word[3]);
-            inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
-            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
-        } else {
+            
+            subDictionaryKeyword<char> quintInnerKeyword(isWord_t::yes, word[4]);
+            auto quintDictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+            quintDictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+            
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
+            // connect the quad dictionary to the quint dictionary with one entry.
+            quad_dictionary_ptr->emplace(std::move(quadInnerKeyword), std::move(quintDictionary_ptr));
+            
+            // connect the tri dictionary to the quad dictionary
+            dictionary.emplace(std::move(hashKey), std::move(quad_dictionary_ptr));
+        }  else {
             auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
-            subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
-            words_ptr->emplace(word.substr(4,word.length()));
-            words_ptr->newLength(word.length());
-            inner_dictionary_ptr->emplace(innerKeyword, std::move(words_ptr));
-            dictionary.emplace(hashKey, std::move(inner_dictionary_ptr));
+            words_ptr->emplace(word.substr(5,word.length()));
+            
+            subDictionaryKeyword<char> quintInnerKeyword(isWord_t::no, word[4]);
+            auto quint_dictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+            quint_dictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+            
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
+            // connect the quad dictionary to the quint dictionary with one entry.
+            quad_dictionary_ptr->emplace(std::move(quadInnerKeyword), std::move(quint_dictionary_ptr));
+    
+            // connect the tri dictionary to the quad dictionary
+            dictionary.emplace(std::move(hashKey), std::move(quad_dictionary_ptr));
         }
     }
     else {
@@ -72,37 +96,79 @@ void WordDictionary::insertWord(std::string word) {
                 triIter->first.setIsWord();
             }
         } else if (word.length() == 4) {
-            auto four_letter_words_ptr = triIter->second.get();
-            subDictionaryKeyword<char> innerKeyword(isWord_t::yes, word[3]);
-            auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
-            if (inner_dictionary_iter == four_letter_words_ptr->end()) {
+            auto quad_dictionary_ptr = triIter->second.get();
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::yes, word[3]);
+            auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
+            if (quad_dictionary_iter == quad_dictionary_ptr->end()) {
                 // the four letter word isn't here.
-                auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
-                four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
+                auto quintDictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+                quad_dictionary_ptr->emplace(std::move(quadInnerKeyword), std::move(quintDictionary_ptr));
 
             } else {
-                if (inner_dictionary_iter->first.isWord() == isWord_t::no)
+                if (quad_dictionary_iter->first.isWord() == isWord_t::no)
                 {
-                    inner_dictionary_iter->first.setIsWord();
+                    quad_dictionary_iter->first.setIsWord();
+                }
+            }
+        } else if (word.length() == 5) {
+            auto quad_dictionary_ptr = triIter->second.get();
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
+            auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
+            if (quad_dictionary_iter == quad_dictionary_ptr->end()) {
+                // the four letter word isn't here. and thus neither is the 5 letter word.
+                auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
+                
+                auto quint_dictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+                subDictionaryKeyword<char> quintInnerKeyword(isWord_t::yes, word[4]);
+                quint_dictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+                
+                quad_dictionary_ptr->emplace(std::move(quadInnerKeyword), std::move(quint_dictionary_ptr));
+            } else {
+                auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+                subDictionaryKeyword<char> quintInnerKeyword(isWord_t::yes, word[4]);
+                auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+                
+                if (quint_dictionary_iter == quint_dictionary_ptr->end() ) {
+                    // the five letter word isn't here
+                    auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
+                    quint_dictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+                } else {
+                    if (quint_dictionary_iter->first.isWord() == isWord_t::no) {
+                        quint_dictionary_iter->first.setIsWord();
+                    }
                 }
             }
         } else {
-            auto four_letter_words_ptr = triIter->second.get();
-            subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
-            auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
-            if (inner_dictionary_iter == four_letter_words_ptr->end()) {
-                // the four letter word isn't here.
-                subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
+            auto quad_dictionary_ptr = triIter->second.get();
+            subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
+            auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
+            if (quad_dictionary_iter == quad_dictionary_ptr->end()) {
+                // the four letter word isn't here, so neither is the 5 letter root.
+
                 auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
-                words_ptr->emplace(word.substr(4, word.length()));
-                words_ptr->newLength(word.length());
-                four_letter_words_ptr->emplace(innerKeyword, std::move(words_ptr));
+                auto quint_dictionary_ptr = QuintInnerDictionaryPtr_t(new QuintInnerDictionary_t);
+                subDictionaryKeyword<char> quintInnerKeyword(isWord_t::no, word[4]);
+                words_ptr->emplace(word.substr(5, word.length()));
+                quint_dictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+                
+                quad_dictionary_ptr->emplace(quadInnerKeyword, std::move(quint_dictionary_ptr));
             } else {
-                auto words_ptr = inner_dictionary_iter->second.get();
-                auto stored_word = word.substr(4, word.length());
-                if (words_ptr->end() == words_ptr->find(stored_word)) {
+                auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+                subDictionaryKeyword<char> quintInnerKeyword(isWord_t::no, word[4]);
+                auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+                
+                if (quint_dictionary_iter == quint_dictionary_ptr->end() ) {
+                    // the five letter root isn't here
+                    auto words_ptr = InnerDictionarySetPtr_t(new setWithMaxLength);
+                    auto stored_word = word.substr(5, word.length());
                     words_ptr->emplace(std::move(stored_word));
-                    words_ptr->newLength(word.length());
+                    quint_dictionary_ptr->emplace(std::move(quintInnerKeyword), std::move(words_ptr));
+                } else {
+                    auto words_ptr = quint_dictionary_iter->second.get();
+                    auto stored_word = word.substr(5, word.length());
+                    if (words_ptr->find(stored_word) == words_ptr->end()) {
+                        words_ptr->emplace(std::move(stored_word));
+                    }
                 }
             }
         }
@@ -130,6 +196,7 @@ WordDictionary::WordDictionary() {
     
     std::string wordList[] = {
      "test"
+    ,"army"
     ,"arm"
     ,"art"
     ,"ate"
@@ -164,6 +231,8 @@ WordDictionary::WordDictionary() {
     ,"formats"
     ,"formatted"
     ,"fort"
+    ,"fortify"
+    ,"fortifying"
     ,"forts"
     ,"mat"
     ,"mate"
@@ -233,82 +302,121 @@ WordDictionary::isInDictionary(std::string word) const {
     auto triIter = dictionary.find(hashkey);
     if (triIter != dictionary.end()) {
         if (word.length() == 3) {
-            if (triIter->first.isWord()) {
+            auto more_prefixes = triIter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+            if (triIter->first.isWord() == isWord_t::yes) {
             // 3 letter word found.
-                return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+                return {FoundWord_t::Found, more_prefixes, std::move(word)};
             }
-            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::Found,{});
+            return {FoundWord_t::NotFound, more_prefixes,std::string()};
         }
         
-        subDictionaryKeyword<char> innerKeyword(isWord_t::no, word[3]);
-        auto four_letter_words_ptr = triIter->second.get();
-        auto inner_dictionary_iter = four_letter_words_ptr->find(innerKeyword);
-        if (inner_dictionary_iter != four_letter_words_ptr->end()) {
+        subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
+        auto quad_dictionary_ptr = triIter->second.get();
+        auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
+        if (quad_dictionary_iter != quad_dictionary_ptr->end()) {
             if (word.length() == 4) {
-                if (inner_dictionary_iter->first.isWord()) {
-                    return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+                auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+                if (quad_dictionary_iter->first.isWord() == isWord_t::yes) {
+                    return {FoundWord_t::Found, more_prefixes, std::move(word)};
                 }
                 
-                return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::Found,{});
+                return {FoundWord_t::NotFound,more_prefixes,std::string()};
             }
             
-            auto endOfWord = word.substr(4,word.length());
-            auto set_iter = inner_dictionary_iter->second->find(endOfWord);
-            if (set_iter != inner_dictionary_iter->second->end()) {
-                return {FoundWord_t::Found, LeadingPrefixFound_t::Found, std::move(word)};
+            if (word.length() == 5) {
+                subDictionaryKeyword<char> quintInnerKeyword(isWord_t::yes, word[4]);
+                auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+                auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+                if (quint_dictionary_iter != quint_dictionary_ptr->end() ) {
+                    auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+                    if (quint_dictionary_iter->first.isWord() == isWord_t::yes) {
+                        return {FoundWord_t::Found, more_prefixes, std::move(word)};
+                    }
+                    return {FoundWord_t::NotFound, more_prefixes, std::string()};
+                }
+                return {FoundWord_t::NotFound, LeadingPrefixFound_t::NotFound, std::string()};
             }
             
-            size_t max_wordLenth_in_set(inner_dictionary_iter->second->getMaxLength());
-            
-            if (max_wordLenth_in_set <= word.length()) {
-                // there is no chance that any other word with this prefix will be found.
-                // as it's longer than any known word with this prefix
-                return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
+
+            auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+            subDictionaryKeyword<char> quintInnerKeyword(isWord_t::no, word[4]);
+            auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+            if (quint_dictionary_iter != quint_dictionary_ptr->end() ) {
+                
+                auto endOfWord = word.substr(5,word.length());
+                auto word_list = quint_dictionary_iter->second.get();
+                size_t max_wordLength_in_word_list(word_list->getMaxLength());
+                
+                auto more_prefixes = (word.length() > max_wordLength_in_word_list) ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+                auto word_list_iter = word_list->find(endOfWord);
+                if (word_list_iter != word_list->end()) {
+                    if (word_list->size() == 1) {
+                        // this is the only word here, so stop looking.
+                        more_prefixes = LeadingPrefixFound_t::NotFound;
+                    }
+                    return {FoundWord_t::Found, more_prefixes, std::move(word)};
+                }
+
+                return {FoundWord_t::NotFound, more_prefixes, std::string()};
             }
-        
-            return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound, LeadingPrefixFound_t::Found,{});
+            return {FoundWord_t::NotFound, LeadingPrefixFound_t::NotFound, std::string()};
+
         }
 
     }
 
-    return std::make_tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>(FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,{});
+    return {FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,std::string()};
 }
 
 void WordDictionary::printDictionary(std::ostream &os) const {
     using std::endl;
 
-    int wordCount = 0;
-    os << "Dictionary contains: " << dictionary.size() << " tri's " << endl;
-    int quadCount = 0;
+    int word_count = 0;
+    os << "Dictionary contains: " << dictionary.size() << " tri's" << endl;
+    int quad_count = 0;
+    int quint_count = 0;
     for (auto &triList: dictionary) {
-        if (triList.first.isWord()) {
-            ++wordCount;
+        if (triList.first.isWord() == isWord_t::yes) {
+            ++word_count;
         }
-        quadCount += triList.second->size();
-        for (auto &wordList: *triList.second.get()) {
-            if (wordList.first.isWord()) {
-                ++wordCount;
+        quad_count += triList.second->size();
+        for (auto &quad_list: *triList.second.get()) {
+            if (quad_list.first.isWord() == isWord_t::yes) {
+                ++word_count;
             }
-            wordCount += wordList.second->size();
+            
+            quint_count += quad_list.second->size();
+            for (auto &word_list: *quad_list.second.get()) {
+                if (word_list.first.isWord() == isWord_t::yes) {
+                    ++word_count;
+                }
+                word_count += word_list.second.get()->size();
+            }
         }
     }
-    os << "Dictionary contains: " << quadCount << " quad's " << endl;
+    os << "Dictionary contains: " << quad_count << " quad's" << endl;
+    os << "Dictionary contains: " << quint_count << " quint's" << endl;
 
-    os << "Dictionary contains: " << wordCount << " words " << endl;
+    os << "Dictionary contains: " << word_count << " words" << endl;
 
+#define FDEBUG_DICTIONARY
 #ifdef DEBUG_DICTIONARY
     for (auto &triList: dictionary) {
         if (triList.first.isWord()) {
             os << triList.first.keyWord() << endl;
         }
-        for (auto &wordList: *triList.second.get()) {
-            if (wordList.first.isWord()) {
-                os << triList.first.keyWord() << wordList.first.keyWord() << endl;
+        for (auto &quad_list: *triList.second.get()) {
+            if (quad_list.first.isWord()) {
+                os << triList.first.keyWord() << quad_list.first.keyWord() << endl;
             }
-            for (auto &word: *wordList.second.get()) {
-                os << triList.first.keyWord() << wordList.first.keyWord() << word << endl;
+            for (auto &word_list: *quad_list.second.get()) {
+                if (word_list.first.isWord()) {
+                    os << triList.first.keyWord() << quad_list.first.keyWord() <<word_list.first.keyWord() << endl;
+                }
+                for (auto &word: *word_list.second.get()) {
+                    os << triList.first.keyWord() << quad_list.first.keyWord() << word_list.first.keyWord() << word << endl;
+                }
             }
-
         }
     }
     os << "----------" << endl;

@@ -48,18 +48,26 @@ private:
 class setWithMaxLength : public std::set<std::string>
 {
 public:
+    using inherited = std::set<std::string>;
+    
     setWithMaxLength()
     : m_max_length(0)
     {}
     
+    // overload emplace so that we track the max length word in the set.
+    void emplace(std::string &&rhs) {
+        newLength(rhs.length());
+        inherited::emplace(std::move(rhs));
+    }
+    
+    size_t getMaxLength() const { return 5 + m_max_length;}
+private:
     void newLength(size_t x) {
         if (x > m_max_length ) {
             m_max_length = x;
         }
     }
     
-    size_t getMaxLength() const { return m_max_length;}
-private:
     size_t m_max_length;
 };
 
@@ -69,11 +77,15 @@ class WordDictionary {
 private:
     using subDictionaryKeywordChar_t = subDictionaryKeyword<char>;
     using InnerDictionarySetPtr_t = std::unique_ptr<setWithMaxLength>;
-    using InnerDictionary_t = std::unordered_map<subDictionaryKeywordChar_t, InnerDictionarySetPtr_t,subDictionaryKeywordChar_t, subDictionaryKeywordChar_t>;
     
-    using InnerDictionaryPtr_t = std::unique_ptr<InnerDictionary_t>;
+    using QuintInnerDictionary_t = std::unordered_map<subDictionaryKeywordChar_t, InnerDictionarySetPtr_t,subDictionaryKeywordChar_t, subDictionaryKeywordChar_t>;
+    using QuintInnerDictionaryPtr_t = std::unique_ptr<QuintInnerDictionary_t>;
+    
+    using QuadInnerDictionary_t = std::unordered_map<subDictionaryKeywordChar_t, QuintInnerDictionaryPtr_t,subDictionaryKeywordChar_t, subDictionaryKeywordChar_t>;
+    
+    using QuadInnerDictionaryPtr_t = std::unique_ptr<QuadInnerDictionary_t>;
     using subDictionaryKeywordString_t = subDictionaryKeyword<std::string>;
-    using Dictionary_t = std::unordered_map<subDictionaryKeywordString_t, InnerDictionaryPtr_t, subDictionaryKeywordString_t,subDictionaryKeywordString_t>;
+    using Dictionary_t = std::unordered_map<subDictionaryKeywordString_t, QuadInnerDictionaryPtr_t, subDictionaryKeywordString_t,subDictionaryKeywordString_t>;
  
     Dictionary_t dictionary;
     
