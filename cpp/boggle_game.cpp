@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <string_view>
 #include <thread>
 
 #include "GameConstants.hpp"
@@ -41,7 +42,7 @@ void BoggleGame::init_board() {
     board.clear();
     board.reserve(max_board_elements);
     for (auto i = 0; i < max_board_elements; ++i) {
-        auto c = (rand() % 25) + 'a';
+        auto c = static_cast<char>((rand() % 25) + 'a');
         string letter;
         if (c == 'q') {
             letter += "qu";
@@ -53,7 +54,7 @@ void BoggleGame::init_board() {
     }
 }
     
-void BoggleGame::fill_board_for_testing(std::string const &testData)
+void BoggleGame::fill_board_for_testing(std::string_view const &testData)
 {
     using std::string;
     board.clear();
@@ -132,7 +133,7 @@ std::set<std::string> BoggleGame::play_game(){
     return foundWords;
 }
 
-int scoreWord(std::string &word) {
+int scoreWord(const std::string_view &word) {
     int result = 0;
     switch(word.length()) {
         case 0:

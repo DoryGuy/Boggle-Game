@@ -178,7 +178,7 @@ void WordDictionary::insertWord(std::string word) {
 WordDictionary::WordDictionary() {
     // fill it with words...
     std::ifstream dictionaryFile;
-    dictionaryFile.open("/Users/garypowell/Desktop/QuizQuestions/Boggle-Game/Boggle-Game/dictionary-yawl.txt", std::ios::in);
+    dictionaryFile.open("/Users/garypowell/QuizQuestions/Boggle-Game/dictionary/dictionary-yawl.txt", std::ios::in);
     std::string word;
     if (dictionaryFile.is_open())
     {
@@ -371,10 +371,10 @@ WordDictionary::isInDictionary(std::string word) const {
 void WordDictionary::printDictionary(std::ostream &os) const {
     using std::endl;
 
-    int word_count = 0;
+    std::size_t word_count = 0;
     os << "Dictionary contains: " << dictionary.size() << " tri's" << endl;
-    int quad_count = 0;
-    int quint_count = 0;
+    std::size_t quad_count = 0;
+    std::size_t quint_count = 0;
     for (auto &triList: dictionary) {
         if (triList.first.isWord() == isWord_t::yes) {
             ++word_count;

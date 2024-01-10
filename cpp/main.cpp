@@ -18,7 +18,7 @@ namespace { // anonymous namespace
 void runTest(BoggleGame &game
              , std::string testName
              , std::string testBoardInput
-             , int expectedWordCount) {
+             , std::size_t expectedWordCount) {
     using std::cout;
     
     cout << "Starting test " << testName << "\n";
@@ -37,7 +37,7 @@ void runTest(BoggleGame &game
 }
 }
 
-int main(int argc, const char * argv[]) {
+int main() {
     using std::cout;
     // insert code here...
     BoggleGame game;

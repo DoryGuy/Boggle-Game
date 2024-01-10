@@ -33,8 +33,8 @@ public:
     Location(Location &&) = default;
     Location(Location const &) = default;
     
-    int getRow() const { return row; }
-    int getCol() const { return col; }
+    constexpr int getRow() const { return row; }
+    constexpr int getCol() const { return col; }
     
     void init_board();
     Move_t MoveUp();
@@ -45,7 +45,7 @@ public:
     Move_t MoveUpLeft();
     Move_t MoveDownRight();
     Move_t MoveDownLeft();
-    void printLocation(std::ostream &os) const;};
-
+    void printLocation(std::ostream &os) const;
+};
 
 #endif /* location_hpp */

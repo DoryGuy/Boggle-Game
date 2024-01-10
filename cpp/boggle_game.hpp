@@ -11,6 +11,7 @@
 
 #include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "location.hpp"
@@ -48,7 +49,7 @@ public:
     
     BoggleGame();
     void init_board();
-    void fill_board_for_testing(std::string const &testData);
+    void fill_board_for_testing(std::string_view const &testData);
     int score() const;
     
     // for debugging
