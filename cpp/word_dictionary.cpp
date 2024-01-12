@@ -194,7 +194,7 @@ WordDictionary::WordDictionary() {
     std::cout << "using default dictionary" << std::endl;
     
     
-    std::string wordList[] = {
+    constexpr static char const* wordList[] = {
      "test"
     ,"army"
     ,"arm"
@@ -289,7 +289,7 @@ WordDictionary::WordDictionary() {
     ,"trod"
     };
     for (auto& word: wordList) {
-        insertWord(std::move(word));
+        insertWord(word);
     }
 }
 

@@ -9,10 +9,10 @@
 #ifndef GameConstants_hpp
 #define GameConstants_hpp
 
-constexpr int numberOfColumnsInBoard = 4;
-constexpr int numberOfRowsInBoard = 4;
+constexpr const int numberOfColumnsInBoard = 4;
+constexpr const int numberOfRowsInBoard = 4;
 
-inline int indexInBoard(int row, int column) {
+inline constexpr int indexInBoard(int row, int column) {
     // debug check row < numberOfColumns && column < numberOfColums
     return (numberOfColumnsInBoard * row) + column;
 }

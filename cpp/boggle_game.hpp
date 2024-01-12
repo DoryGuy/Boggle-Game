@@ -9,6 +9,8 @@
 #ifndef boggle_game_hpp
 #define boggle_game_hpp
 
+#include <array>
+#include <mutex>
 #include <set>
 #include <string>
 #include <string_view>
@@ -16,7 +18,6 @@
 
 #include "location.hpp"
 #include "word_dictionary.hpp"
-#include <mutex>
 
 
 class BoggleGame {
@@ -32,7 +33,16 @@ private:
 
     
     BoggleBoard_t board;
-    std::vector<MoveFunctionPtr_t> moveFnPtrs;
+    static constexpr std::array<MoveFunctionPtr_t, 8> moveFnPtrs {
+        &Location::MoveUp,
+        &Location::MoveDown,
+        &Location::MoveLeft,
+        &Location::MoveRight,
+        &Location::MoveUpRight,
+        &Location::MoveUpLeft,
+        &Location::MoveDownRight,
+        &Location::MoveDownLeft
+    };
     std::string currentWord;
     WordDictionary dictionary;
     

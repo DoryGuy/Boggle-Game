@@ -22,15 +22,6 @@
 BoggleGame::BoggleGame()
 {
     init_board();
-    moveFnPtrs.reserve(8); // eight possible moves
-    moveFnPtrs.emplace_back(&Location::MoveUp);
-    moveFnPtrs.emplace_back(&Location::MoveDown);
-    moveFnPtrs.emplace_back(&Location::MoveLeft);
-    moveFnPtrs.emplace_back(&Location::MoveRight);
-    moveFnPtrs.emplace_back(&Location::MoveUpRight);
-    moveFnPtrs.emplace_back(&Location::MoveUpLeft);
-    moveFnPtrs.emplace_back(&Location::MoveDownRight);
-    moveFnPtrs.emplace_back(&Location::MoveDownLeft);
     
     dictionary.printDictionary(std::cout);
 }

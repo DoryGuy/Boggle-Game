@@ -9,25 +9,29 @@
 #ifndef location_hpp
 #define location_hpp
 
+#include "GameConstants.hpp"
+#include <array>
+#include <algorithm>
 #include <ostream>
-#include <vector>
+
 
 enum class Move_t { MOVE_SUCCESS, MOVE_FAIL };
 
 class Location {
 private:
-    using LocationsAvailable_t=std::vector<bool>;
+    using LocationsAvailable_t=std::array<bool, max_board_elements>;
     
     int row;
     int col;
     LocationsAvailable_t locations_available;
     
 public:
-    Location(int r = 0, int c = 0)
+    constexpr Location(int r = 0, int c = 0)
     : row(r)
     , col(c)
     {
-        init_board();
+        std::fill(locations_available.begin(), locations_available.end(), true);
+        locations_available[indexInBoard(row, col)] = false; // we start at the initial position.
     }
     
     Location(Location &&) = default;
@@ -36,7 +40,6 @@ public:
     constexpr int getRow() const { return row; }
     constexpr int getCol() const { return col; }
     
-    void init_board();
     Move_t MoveUp();
     Move_t MoveDown();
     Move_t MoveLeft();

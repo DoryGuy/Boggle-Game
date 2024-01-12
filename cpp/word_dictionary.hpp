@@ -31,15 +31,15 @@ public:
     subDictionaryKeyword & operator=(subDictionaryKeyword &&) = default;
     subDictionaryKeyword & operator=(subDictionaryKeyword const &) = default;
     
-    isWord_t isWord() const { return m_isWord;}
+    constexpr isWord_t isWord() const { return m_isWord;}
     void setIsWord() const { m_isWord = yes; };
-    KeyWord_t const & keyWord() const { return m_keyWord; }
+    constexpr KeyWord_t const & keyWord() const { return m_keyWord; }
     // hash fn
     size_t operator()(const subDictionaryKeyword& k) const;
     // comparison fn as the compiler can't seem to find operator()==
     bool operator()(const subDictionaryKeyword& lhs, const subDictionaryKeyword& rhs) const
         { return lhs == rhs; }
-    bool operator==(subDictionaryKeyword const &rhs) const { return m_keyWord == rhs.m_keyWord; }
+    constexpr bool operator==(subDictionaryKeyword const &rhs) const { return m_keyWord == rhs.m_keyWord; }
 private:
     mutable isWord_t m_isWord; // doesn't change the hash value or the comparison fn result.
     KeyWord_t m_keyWord;
@@ -60,9 +60,9 @@ public:
         inherited::emplace(std::move(rhs));
     }
     
-    size_t getMaxLength() const { return 5 + m_max_length;}
+    constexpr size_t getMaxLength() const { return 5 + m_max_length;}
 private:
-    void newLength(size_t x) {
+    constexpr void newLength(size_t x) {
         if (x > m_max_length ) {
             m_max_length = x;
         }

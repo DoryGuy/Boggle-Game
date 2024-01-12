@@ -7,8 +7,6 @@
 //
 
 #include "location.hpp"
-#include "GameConstants.hpp"
-#include <algorithm>
 
 namespace {
     // do less computation while running, a bit more while compiling.
@@ -16,20 +14,6 @@ namespace {
     constexpr int numberOfRowsInBoardLessOne = numberOfRowsInBoard - 1;
 }
     
-void Location::init_board() {
-    
-    if (locations_available.size() == max_board_elements) {
-        using std::fill;
-        fill(locations_available.begin(), locations_available.end(), true);
-    } else {
-        locations_available.reserve(max_board_elements);
-        for (auto i = 0; i < max_board_elements; ++i) {
-            locations_available.push_back(true);
-        }
-    }
-    locations_available[indexInBoard(row, col)] = false; // we start at the initial position.
-}
-
 Move_t Location::MoveUp() {
     if (row > 0) {
         auto index(indexInBoard(--row, col));
