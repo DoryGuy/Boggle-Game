@@ -21,7 +21,7 @@ enum isWord_t { no, yes};
 template<typename KeyWord_t>
 class subDictionaryKeyword {
 public:
-    subDictionaryKeyword(isWord_t isWord = isWord_t::no, KeyWord_t keyWord = {})
+    explicit subDictionaryKeyword(isWord_t isWord = isWord_t::no, KeyWord_t keyWord = {})
     : m_isWord(isWord)
     , m_keyWord(keyWord)
     {}
@@ -50,7 +50,7 @@ class setWithMaxLength : public std::set<std::string>
 public:
     using inherited = std::set<std::string>;
     
-    setWithMaxLength()
+    constexpr explicit setWithMaxLength()
     : m_max_length(0)
     {}
     
@@ -94,7 +94,13 @@ public:
     enum class FoundWord_t { Found, NotFound };
     enum class LeadingPrefixFound_t { Found, NotFound };
     
-    WordDictionary();
+    explicit WordDictionary();
+
+    WordDictionary(const WordDictionary &) = delete;
+    WordDictionary &operator=(const WordDictionary &) = delete;
+    WordDictionary(WordDictionary &&) = default;
+    WordDictionary &operator=(WordDictionary &&) = default;
+
     // check for both forward spelling and reverse spelling.
     std::tuple<FoundWord_t, LeadingPrefixFound_t, std::string> isInDictionary(std::string word) const;
     void printDictionary(std::ostream &os) const;

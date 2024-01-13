@@ -19,7 +19,7 @@ class ThreadRAII {
 public:
     enum class DtorAction { join, detach };
     
-    ThreadRAII(std::thread&& t, DtorAction a)
+    explicit ThreadRAII(std::thread&& t, DtorAction a)
     : m_action(a)
     , m_t(std::move(t))
     {}
@@ -35,7 +35,9 @@ public:
     }
     
     // no copies, as we can't copy a thread object.
+    ThreadRAII(ThreadRAII &) = delete;
     ThreadRAII(ThreadRAII const &) = delete;
+    ThreadRAII& operator=(ThreadRAII &) = delete;
     ThreadRAII& operator=(ThreadRAII const &) = delete;
     
     // we can move it though

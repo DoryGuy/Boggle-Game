@@ -57,7 +57,7 @@ public:
     // indicator that there are no more possible words following this path.
     enum class KeepTrying_t { keepGoing, stop };
     
-    BoggleGame();
+    explicit BoggleGame();
     void init_board();
     void fill_board_for_testing(std::string_view const &testData);
     int score() const;

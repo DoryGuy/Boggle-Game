@@ -26,7 +26,7 @@ private:
     LocationsAvailable_t locations_available;
     
 public:
-    constexpr Location(int r = 0, int c = 0)
+    constexpr explicit Location(int r = 0, int c = 0)
     : row(r)
     , col(c)
     {
