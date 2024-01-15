@@ -34,4 +34,8 @@
 # Editor swap files
 *.swp
 
+#ctags file
 tags
+
+# Object build directory
+obj

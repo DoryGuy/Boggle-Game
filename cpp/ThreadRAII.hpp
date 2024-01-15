@@ -25,12 +25,16 @@ public:
     {}
     
     ~ThreadRAII() {
-        if (m_t.joinable() ) {
-            if (m_action == DtorAction::join) {
-                m_t.join();
-            } else {
-                m_t.detach();
+        try {
+            if (m_t.joinable() ) {
+                if (m_action == DtorAction::join) {
+                    m_t.join();
+                } else {
+                    m_t.detach();
+                }
             }
+        } catch(...) {
+            // don't crash
         }
     }
     
@@ -44,7 +48,8 @@ public:
     ThreadRAII(ThreadRAII&&) = default;
     ThreadRAII& operator=(ThreadRAII&&) = default;
     
-    std::thread& get() { return m_t; }
+    bool joinable() { return m_t.joinable(); }
+    void join() { m_t.join(); }
     
 private:
     DtorAction m_action;

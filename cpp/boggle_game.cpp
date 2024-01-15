@@ -102,7 +102,7 @@ std::set<std::string> BoggleGame::play_game(){
     using std::vector;
     using std::thread;
     
-    // we are going to use one process for each location on the board.
+    // we are going to use one thread for each location on the board.
     vector<ThreadRAII> processes;
     // preallocate enough space
     processes.reserve(numberOfColumnsInBoard*numberOfRowsInBoard);
@@ -119,7 +119,9 @@ std::set<std::string> BoggleGame::play_game(){
     }
     
     for (auto& t: processes) {
-        t.get().join();
+        if (t.joinable() ) {
+            t.join();
+        }
     }
     return foundWords;
 }
