@@ -48,7 +48,7 @@ public:
     ThreadRAII(ThreadRAII&&) = default;
     ThreadRAII& operator=(ThreadRAII&&) = default;
     
-    bool joinable() { return m_t.joinable(); }
+    [[nodiscard]] bool joinable() { return m_t.joinable(); }
     void join() { m_t.join(); }
     
 private:

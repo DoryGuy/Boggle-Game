@@ -37,18 +37,18 @@ public:
     Location(Location &&) = default;
     Location(Location const &) = default;
     
-    constexpr int getRow() const { return row; }
-    constexpr int getCol() const { return col; }
+    [[nodiscard]] constexpr int getRow() const { return row; }
+    [[nodiscard]] constexpr int getCol() const { return col; }
     
-    Move_t MoveUp();
-    Move_t MoveDown();
-    Move_t MoveLeft();
-    Move_t MoveRight();
-    Move_t MoveUpRight();
-    Move_t MoveUpLeft();
-    Move_t MoveDownRight();
-    Move_t MoveDownLeft();
-    void printLocation(std::ostream &os) const;
+    [[nodiscard]] Move_t MoveUp();
+    [[nodiscard]] Move_t MoveDown();
+    [[nodiscard]] Move_t MoveLeft();
+    [[nodiscard]] Move_t MoveRight();
+    [[nodiscard]] Move_t MoveUpRight();
+    [[nodiscard]] Move_t MoveUpLeft();
+    [[nodiscard]] Move_t MoveDownRight();
+    [[nodiscard]] Move_t MoveDownLeft();
+    std::ostream & printLocation(std::ostream &os) const;
 };
 
 #endif /* location_hpp */

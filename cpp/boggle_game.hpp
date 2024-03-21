@@ -60,12 +60,12 @@ public:
     explicit BoggleGame();
     void init_board();
     void fill_board_for_testing(std::string_view const &testData);
-    int score() const;
+    [[nodiscard]] int score() const;
     
     // for debugging
-    KeepTrying_t checkWord(std::string word);
+    [[nodiscard]] KeepTrying_t checkWord(std::string word);
     std::ostream &printTheBoard(std::ostream &);
 
-    std::set<std::string> play_game();
+    [[nodiscard]] std::set<std::string> play_game();
 };
 #endif /* boggle_game_hpp */

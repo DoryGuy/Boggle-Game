@@ -28,18 +28,18 @@ public:
     
     subDictionaryKeyword(subDictionaryKeyword const & rhs) = default;
     subDictionaryKeyword(subDictionaryKeyword &&) = default;
-    subDictionaryKeyword & operator=(subDictionaryKeyword &&) = default;
-    subDictionaryKeyword & operator=(subDictionaryKeyword const &) = default;
+    [[nodiscard]] subDictionaryKeyword & operator=(subDictionaryKeyword &&) = default;
+    [[nodiscard]] subDictionaryKeyword & operator=(subDictionaryKeyword const &) = default;
     
-    constexpr isWord_t isWord() const { return m_isWord;}
+    [[nodiscard]] constexpr isWord_t isWord() const { return m_isWord;}
     void setIsWord() const { m_isWord = yes; };
-    constexpr KeyWord_t const & keyWord() const { return m_keyWord; }
+    [[nodiscard]] constexpr KeyWord_t const & keyWord() const { return m_keyWord; }
     // hash fn
-    size_t operator()(const subDictionaryKeyword& k) const;
+    [[nodiscard]] size_t operator()(const subDictionaryKeyword& k) const;
     // comparison fn as the compiler can't seem to find operator()==
-    bool operator()(const subDictionaryKeyword& lhs, const subDictionaryKeyword& rhs) const
+    [[nodiscard]] bool operator()(const subDictionaryKeyword& lhs, const subDictionaryKeyword& rhs) const
         { return lhs == rhs; }
-    constexpr bool operator==(subDictionaryKeyword const &rhs) const { return m_keyWord == rhs.m_keyWord; }
+    [[nodiscard]] constexpr bool operator==(subDictionaryKeyword const &rhs) const { return m_keyWord == rhs.m_keyWord; }
 private:
     mutable isWord_t m_isWord; // doesn't change the hash value or the comparison fn result.
     KeyWord_t m_keyWord;
@@ -60,7 +60,7 @@ public:
         inherited::emplace(std::move(rhs));
     }
     
-    constexpr size_t getMaxLength() const { return 5 + m_max_length;}
+    [[nodiscard]] constexpr size_t getMaxLength() const { return 5 + m_max_length;}
 private:
     constexpr void newLength(size_t x) {
         if (x > m_max_length ) {
@@ -99,10 +99,10 @@ public:
     WordDictionary(const WordDictionary &) = delete;
     WordDictionary &operator=(const WordDictionary &) = delete;
     WordDictionary(WordDictionary &&) = default;
-    WordDictionary &operator=(WordDictionary &&) = default;
+    [[nodiscard]] WordDictionary &operator=(WordDictionary &&) = default;
 
     // check for both forward spelling and reverse spelling.
-    std::tuple<FoundWord_t, LeadingPrefixFound_t, std::string> isInDictionary(std::string word) const;
-    void printDictionary(std::ostream &os) const;
+    [[nodiscard]] std::tuple<FoundWord_t, LeadingPrefixFound_t, std::string> isInDictionary(std::string word) const;
+    std::ostream & printDictionary(std::ostream &os) const;
 };
 #endif /* dictionary_hpp */

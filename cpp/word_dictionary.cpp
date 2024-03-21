@@ -29,6 +29,7 @@ size_t subDictionaryKeyword<std::string>::operator()(const subDictionaryKeyword<
 
 // return just the first three letters of the word.
 subDictionaryKeyword<std::string> hashTheWord(std::string word) {
+
     auto isWord = word.length() == 3 ? isWord_t::yes : isWord_t::no;
     return subDictionaryKeyword<std::string>(isWord, word.substr(0, 3));
 }
@@ -368,7 +369,7 @@ WordDictionary::isInDictionary(std::string word) const {
     return {FoundWord_t::NotFound,LeadingPrefixFound_t::NotFound,std::string()};
 }
 
-void WordDictionary::printDictionary(std::ostream &os) const {
+std::ostream & WordDictionary::printDictionary(std::ostream &os) const {
     using std::endl;
 
     std::size_t word_count = 0;
@@ -421,4 +422,5 @@ void WordDictionary::printDictionary(std::ostream &os) const {
     }
     os << "----------" << endl;
 #endif
+    return os;
 }

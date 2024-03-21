@@ -123,12 +123,13 @@ Move_t Location::MoveDownLeft() {
     return Move_t::MOVE_FAIL;
 }
 
-void Location::printLocation(std::ostream &os) const {
+std::ostream& Location::printLocation(std::ostream &os) const {
     for (auto row = 0; row < numberOfRowsInBoard; ++row) {
         for (auto col = 0; col < numberOfColumnsInBoard; ++col) {
             os << (locations_available[indexInBoard(row,col)] ? "0 " : "X ");
         }
         os << std::endl;
     }
+    return os;
 }
 
