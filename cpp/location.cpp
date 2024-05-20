@@ -16,7 +16,7 @@ namespace {
     
 Move_t Location::MoveUp() {
     if (row > 0) {
-        auto index(indexInBoard(--row, col));
+        const auto index(indexInBoard(--row, col));
         if (locations_available[index]) {
             locations_available[index] = false;
             return Move_t::MOVE_SUCCESS;
@@ -28,7 +28,7 @@ Move_t Location::MoveUp() {
 
 Move_t Location::MoveDown() {
     if (row < numberOfRowsInBoardLessOne) {
-        auto index(indexInBoard(++row, col));
+        const auto index(indexInBoard(++row, col));
         if (locations_available[index]) {
             locations_available[index] = false;
             return Move_t::MOVE_SUCCESS;
@@ -40,7 +40,7 @@ Move_t Location::MoveDown() {
 
 Move_t Location::MoveLeft() {
     if (col > 0) {
-        auto index(indexInBoard(row, --col));
+        const auto index(indexInBoard(row, --col));
         if (locations_available[index]) {
             locations_available[index] = false;
             return Move_t::MOVE_SUCCESS;
@@ -52,7 +52,7 @@ Move_t Location::MoveLeft() {
 
 Move_t Location::MoveRight() {
     if (col < numberOfColumnsInBoardLessOne) {
-        auto index(indexInBoard(row, ++col));
+        const auto index(indexInBoard(row, ++col));
         if (locations_available[index]) {
             locations_available[index] = false;
             return Move_t::MOVE_SUCCESS;
@@ -64,9 +64,9 @@ Move_t Location::MoveRight() {
 
 Move_t Location::MoveUpRight() {
     if (row > 0) {
-        auto new_col = col + 1;
+        const auto new_col = col + 1;
         if (new_col < numberOfColumnsInBoard) {
-            auto index(indexInBoard(--row, new_col));
+            const auto index(indexInBoard(--row, new_col));
             if (locations_available[index]) {
                 col = new_col;
                 locations_available[index] = false;
@@ -81,7 +81,7 @@ Move_t Location::MoveUpRight() {
 Move_t Location::MoveUpLeft() {
     if (row > 0) {
         if (col > 0) {
-            auto index(indexInBoard(--row, --col));
+            const auto index(indexInBoard(--row, --col));
             if (locations_available[index]) {
                 locations_available[index] = false;
                 return Move_t::MOVE_SUCCESS;
@@ -96,7 +96,7 @@ Move_t Location::MoveUpLeft() {
 Move_t Location::MoveDownRight() {
     if (row < numberOfRowsInBoardLessOne) {
         if (col < numberOfColumnsInBoardLessOne) {
-            auto index(indexInBoard(++row, ++col));
+            const auto index(indexInBoard(++row, ++col));
             if (locations_available[index]) {
                 locations_available[index] = false;
                 return Move_t::MOVE_SUCCESS;
@@ -111,7 +111,7 @@ Move_t Location::MoveDownRight() {
 Move_t Location::MoveDownLeft() {
     if (row < numberOfRowsInBoardLessOne) {
         if (col > 0) {
-            auto index(indexInBoard(++row, --col));
+            const auto index(indexInBoard(++row, --col));
             if (locations_available[index]) {
                 locations_available[index] = false;
                 return Move_t::MOVE_SUCCESS;

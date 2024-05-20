@@ -33,7 +33,7 @@ void BoggleGame::init_board() {
     board.clear();
     board.reserve(max_board_elements);
     for (auto i = 0; i < max_board_elements; ++i) {
-        auto c = static_cast<char>((rand() % 25) + 'a');
+        const auto c = static_cast<char>((rand() % 25) + 'a');
         string letter;
         if (c == 'q') {
             letter += "qu";
@@ -165,7 +165,7 @@ std::ostream &BoggleGame::printTheBoard(std::ostream &os) {
     
     for (int row = 0; row < numberOfRowsInBoard; ++row) {
         for (int col = 0; col < numberOfColumnsInBoard; ++col) {
-            auto c = board[indexInBoard(row, col)];
+            const auto c = board[indexInBoard(row, col)];
             os << c;
             if (c.length() == 2 ) {
                 os << " ";

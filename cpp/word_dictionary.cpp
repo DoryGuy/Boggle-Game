@@ -30,7 +30,7 @@ size_t subDictionaryKeyword<std::string>::operator()(const subDictionaryKeyword<
 // return just the first three letters of the word.
 subDictionaryKeyword<std::string> hashTheWord(std::string word) {
 
-    auto isWord = word.length() == 3 ? isWord_t::yes : isWord_t::no;
+    const auto isWord = word.length() == 3 ? isWord_t::yes : isWord_t::no;
     return subDictionaryKeyword<std::string>(isWord, word.substr(0, 3));
 }
 
@@ -46,7 +46,7 @@ void WordDictionary::insertWord(std::string word) {
     }
     transform(word.begin(), word.end(), word.begin(), ::tolower);
     auto hashKey = hashTheWord(word);
-    auto triIter = dictionary.find(hashKey);
+    const auto triIter = dictionary.find(hashKey);
     
     if (triIter == dictionary.end()) {
         using std::set;
@@ -299,11 +299,11 @@ std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, st
 WordDictionary::isInDictionary(std::string word) const {
     using std::reverse;
 
-    auto hashkey = hashTheWord(word);
-    auto triIter = dictionary.find(hashkey);
+    const auto hashkey = hashTheWord(word);
+    const auto triIter = dictionary.find(hashkey);
     if (triIter != dictionary.end()) {
         if (word.length() == 3) {
-            auto more_prefixes = triIter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+            const auto more_prefixes = triIter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
             if (triIter->first.isWord() == isWord_t::yes) {
             // 3 letter word found.
                 return {FoundWord_t::Found, more_prefixes, std::move(word)};
@@ -312,11 +312,11 @@ WordDictionary::isInDictionary(std::string word) const {
         }
         
         subDictionaryKeyword<char> quadInnerKeyword(isWord_t::no, word[3]);
-        auto quad_dictionary_ptr = triIter->second.get();
-        auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
+        const auto quad_dictionary_ptr = triIter->second.get();
+        const auto quad_dictionary_iter = quad_dictionary_ptr->find(quadInnerKeyword);
         if (quad_dictionary_iter != quad_dictionary_ptr->end()) {
             if (word.length() == 4) {
-                auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+                const auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
                 if (quad_dictionary_iter->first.isWord() == isWord_t::yes) {
                     return {FoundWord_t::Found, more_prefixes, std::move(word)};
                 }
@@ -326,10 +326,10 @@ WordDictionary::isInDictionary(std::string word) const {
             
             if (word.length() == 5) {
                 subDictionaryKeyword<char> quintInnerKeyword(isWord_t::yes, word[4]);
-                auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
-                auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+                const auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+                const auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
                 if (quint_dictionary_iter != quint_dictionary_ptr->end() ) {
-                    auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
+                    const auto more_prefixes = quad_dictionary_iter->second->empty() ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
                     if (quint_dictionary_iter->first.isWord() == isWord_t::yes) {
                         return {FoundWord_t::Found, more_prefixes, std::move(word)};
                     }
@@ -339,17 +339,17 @@ WordDictionary::isInDictionary(std::string word) const {
             }
             
 
-            auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
+            const auto quint_dictionary_ptr = quad_dictionary_iter->second.get();
             subDictionaryKeyword<char> quintInnerKeyword(isWord_t::no, word[4]);
-            auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
+            const auto quint_dictionary_iter = quint_dictionary_ptr->find(quintInnerKeyword);
             if (quint_dictionary_iter != quint_dictionary_ptr->end() ) {
                 
-                auto endOfWord = word.substr(5,word.length());
-                auto word_list = quint_dictionary_iter->second.get();
+                const auto endOfWord = word.substr(5,word.length());
+                const auto word_list = quint_dictionary_iter->second.get();
                 size_t max_wordLength_in_word_list(word_list->getMaxLength());
                 
                 auto more_prefixes = (word.length() > max_wordLength_in_word_list) ? LeadingPrefixFound_t::NotFound : LeadingPrefixFound_t::Found;
-                auto word_list_iter = word_list->find(endOfWord);
+                const auto word_list_iter = word_list->find(endOfWord);
                 if (word_list_iter != word_list->end()) {
                     if (word_list->size() == 1) {
                         // this is the only word here, so stop looking.

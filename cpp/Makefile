@@ -5,7 +5,7 @@
 #We don't need to clean up when we're making these targets
 NODEPS:=clean cleaner ctags
 
-CXX=g++-13
+CXX=g++-14
 CXX_VERSION=c++23
 OPTIMIZE_FLAG=-O3
 DEBUG_FLAG=-g

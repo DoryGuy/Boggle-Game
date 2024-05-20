@@ -24,9 +24,9 @@ void runTest(BoggleGame &game
     cout << "Starting test " << testName << "\n";
     game.fill_board_for_testing(std::move(testBoardInput));
     game.printTheBoard(cout);
-    auto now = std::chrono::high_resolution_clock::now();
-    auto result = game.play_game();
-    auto run_time = std::chrono::high_resolution_clock::now() - now;
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto result = game.play_game();
+    const auto run_time = std::chrono::high_resolution_clock::now() - now;
     cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(run_time).count()
     << " millieconds \n";
     cout << "Words Found = " << result.size() << "! Score = " << game.score() << "\n";
