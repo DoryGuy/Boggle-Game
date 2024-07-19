@@ -36,9 +36,6 @@ subDictionaryKeyword<std::string> hashTheWord(std::string word) {
 
 void WordDictionary::insertWord(std::string word) {
     using std::transform;
-    using std::string;
-    using std::unique_ptr;
-    using std::set;
 
     // no point in having a dictionary with words that won't score.
     if (word.length() < 3 || word.length() > max_board_elements) {
@@ -49,7 +46,6 @@ void WordDictionary::insertWord(std::string word) {
     const auto triIter = dictionary.find(hashKey);
     
     if (triIter == dictionary.end()) {
-        using std::set;
         auto quad_dictionary_ptr = QuadInnerDictionaryPtr_t(new QuadInnerDictionary_t);
         
         if (word.length() == 3) {
@@ -297,7 +293,6 @@ WordDictionary::WordDictionary() {
 // check for both forward spelling and reverse spelling.
 std::tuple<WordDictionary::FoundWord_t, WordDictionary::LeadingPrefixFound_t, std::string>
 WordDictionary::isInDictionary(std::string word) const {
-    using std::reverse;
 
     const auto hashkey = hashTheWord(word);
     const auto triIter = dictionary.find(hashkey);

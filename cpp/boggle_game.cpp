@@ -32,7 +32,7 @@ void BoggleGame::init_board() {
     // stupid but easy way to fill board.
     board.clear();
     board.reserve(max_board_elements);
-    for (auto i = 0; i < max_board_elements; ++i) {
+    for (auto _ = 0; _ < max_board_elements; ++_) {
         const auto c = static_cast<char>((rand() % 25) + 'a');
         string letter;
         if (c == 'q') {
