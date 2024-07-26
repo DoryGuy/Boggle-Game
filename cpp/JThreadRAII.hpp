@@ -1,31 +1,32 @@
 //
-//  ThreadRAII.hpp
+//  JThreadRAII.hpp
 //  BoggleMultiProcess
 //
 //  Created by Gary Powell on 7/5/19.
 //  Copyright © 2019 Guest User. All rights reserved.
 //
 
-#ifndef ThreadRAII_hpp
-#define ThreadRAII_hpp
+#ifndef JThreadRAII_hpp
+#define JThreadRAII_hpp
 
 #include <thread>
-#include <utility> // std::move, std::swap
+#include <utility> // std::move
 
 // The purpose of this class is to guarantee that threads will always be cleanly
 // destructed, either join, or detach will be called.
 // code from "Effective Modern C++" by Scott Meyers
+// upgraded to use jthread
 
-class ThreadRAII {
+class JThreadRAII {
 public:
     enum class DtorAction { join, detach };
     
-    explicit ThreadRAII(std::thread&& t, DtorAction a)
+    explicit JThreadRAII(std::jthread&& t, DtorAction a)
     : m_action(a)
     , m_t(std::move(t))
     {}
     
-    ~ThreadRAII() {
+    ~JThreadRAII() {
         try {
             if (m_t.joinable() ) {
                 if (m_action == DtorAction::join) {
@@ -40,18 +41,18 @@ public:
     }
     
     // no copies, as we can't copy a thread object.
-    ThreadRAII(ThreadRAII &) = delete;
-    ThreadRAII(ThreadRAII const &) = delete;
-    ThreadRAII& operator=(ThreadRAII &) = delete;
-    ThreadRAII& operator=(ThreadRAII const &) = delete;
+    JThreadRAII(JThreadRAII &) = delete;
+    JThreadRAII(JThreadRAII const &) = delete;
+    JThreadRAII& operator=(JThreadRAII &) = delete;
+    JThreadRAII& operator=(JThreadRAII const &) = delete;
     
     // we can move it though
-    ThreadRAII(ThreadRAII&&) = default;
-    ThreadRAII& operator=(ThreadRAII&&) = default;
+    JThreadRAII(JThreadRAII&&) = default;
+    JThreadRAII& operator=(JThreadRAII&&) = default;
     
     [[nodiscard]] bool joinable() { return m_t.joinable(); }
     void join() { m_t.join(); }
-    void swap(ThreadRAII& t) { // nothrow
+    void swap(JThreadRAII& t) { // nothrow
         using std::swap;
         swap(m_action, t.m_action);
         swap(m_t, t.m_t);
@@ -59,8 +60,8 @@ public:
     
 private:
     DtorAction m_action;
-    std::thread m_t;
+    std::jthread m_t;
 };
 
 
-#endif /* ThreadRAII_hpp */
+#endif /* JThreadRAII_hpp */

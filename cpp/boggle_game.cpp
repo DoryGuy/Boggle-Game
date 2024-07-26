@@ -15,7 +15,7 @@
 #include <thread>
 
 #include "GameConstants.hpp"
-#include "ThreadRAII.hpp"
+#include "JThreadRAII.hpp"
 
 // the real game has a "Qu" so we need to store two letters, or always just insert "u" when we see "Q".
 
@@ -100,10 +100,10 @@ void BoggleGame::moveNextPostion(std::string currentWord, Location original_loca
 std::set<std::string> BoggleGame::play_game(){
     using std::string;
     using std::vector;
-    using std::thread;
+    using std::jthread;
     
     // we are going to use one thread for each location on the board.
-    vector<ThreadRAII> processes;
+    vector<JThreadRAII> processes;
     // preallocate enough space
     processes.reserve(numberOfColumnsInBoard*numberOfRowsInBoard);
     for (int row = 0; row < numberOfRowsInBoard; ++row) {
@@ -114,7 +114,7 @@ std::set<std::string> BoggleGame::play_game(){
             auto moveFn = [&,location=std::move(location),currentWord=std::move(currentWord)]() -> void {
                 moveNextPostion(currentWord, location);
             };
-            processes.emplace_back(ThreadRAII(thread(moveFn), ThreadRAII::DtorAction::join));
+            processes.emplace_back(JThreadRAII(jthread(moveFn), JThreadRAII::DtorAction::join));
         }
     }
     
