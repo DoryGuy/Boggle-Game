@@ -20,7 +20,7 @@ class ThreadRAII {
 public:
     enum class DtorAction { join, detach };
     
-    explicit ThreadRAII(std::thread&& t, DtorAction a)
+    explicit ThreadRAII(std::thread&& t, DtorAction a) noexcept
     : m_action(a)
     , m_t(std::move(t))
     {}
@@ -46,12 +46,12 @@ public:
     ThreadRAII& operator=(ThreadRAII const &) = delete;
     
     // we can move it though
-    ThreadRAII(ThreadRAII&&) = default;
-    ThreadRAII& operator=(ThreadRAII&&) = default;
+    ThreadRAII(ThreadRAII&&) noexcept = default;
+    [[nodiscard]] ThreadRAII& operator=(ThreadRAII&&) noexcept = default;
     
     [[nodiscard]] bool joinable() { return m_t.joinable(); }
     void join() { m_t.join(); }
-    void swap(ThreadRAII& t) { // nothrow
+    void swap(ThreadRAII& t) noexcept {
         using std::swap;
         swap(m_action, t.m_action);
         swap(m_t, t.m_t);
