@@ -39,7 +39,7 @@ void runTest(BoggleGame &game
 
 int main() {
     using std::cout;
-    // insert code here...
+
     BoggleGame game;
   
     if (true) // basic test cases.

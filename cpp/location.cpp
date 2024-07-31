@@ -79,23 +79,21 @@ Move_t Location::MoveUpRight() {
 }
 
 Move_t Location::MoveUpLeft() {
-    if (row > 0) {
-        if (col > 0) {
-            const auto index(indexInBoard(--row, --col));
-            if (locations_available[index]) {
-                locations_available[index] = false;
-                return Move_t::MOVE_SUCCESS;
-            }
-            ++row;
-            ++col;
+    if (row > 0 && col > 0) {
+        const auto index(indexInBoard(--row, --col));
+        if (locations_available[index]) {
+            locations_available[index] = false;
+            return Move_t::MOVE_SUCCESS;
         }
+        ++row;
+        ++col;
     }
     return Move_t::MOVE_FAIL;
 }
 
 Move_t Location::MoveDownRight() {
-    if (row < numberOfRowsInBoardLessOne) {
-        if (col < numberOfColumnsInBoardLessOne) {
+    if (row < numberOfRowsInBoardLessOne &&
+        col < numberOfColumnsInBoardLessOne) {
             const auto index(indexInBoard(++row, ++col));
             if (locations_available[index]) {
                 locations_available[index] = false;
@@ -103,14 +101,13 @@ Move_t Location::MoveDownRight() {
             }
             --row;
             --col;
-        }
     }
     return Move_t::MOVE_FAIL;
 }
 
 Move_t Location::MoveDownLeft() {
-    if (row < numberOfRowsInBoardLessOne) {
-        if (col > 0) {
+    if (row < numberOfRowsInBoardLessOne &&
+        col > 0) {
             const auto index(indexInBoard(++row, --col));
             if (locations_available[index]) {
                 locations_available[index] = false;
@@ -118,7 +115,6 @@ Move_t Location::MoveDownLeft() {
             }
             --row;
             ++col;
-        }
     }
     return Move_t::MOVE_FAIL;
 }

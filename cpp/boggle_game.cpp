@@ -132,7 +132,7 @@ int scoreWord(const std::string_view &word) {
         case 0:
         case 1:
         case 2:
-            result = 0;
+            // result = 0;
             break;
         case 3:
         case 4:
