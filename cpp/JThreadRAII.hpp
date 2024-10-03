@@ -50,7 +50,7 @@ public:
     JThreadRAII(JThreadRAII&&) noexcept = default;
     [[nodiscard]] JThreadRAII& operator=(JThreadRAII&&) noexcept = default;
     
-    [[nodiscard]] bool joinable() { return m_t.joinable(); }
+    [[nodiscard]] constexpr bool joinable() { return m_t.joinable(); }
     void join() { m_t.join(); }
     void swap(JThreadRAII& t) noexcept {
         using std::swap;

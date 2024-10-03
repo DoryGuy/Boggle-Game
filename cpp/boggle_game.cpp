@@ -114,7 +114,7 @@ std::set<std::string> BoggleGame::play_game(){
             auto moveFn = [&,location=std::move(location),currentWord=std::move(currentWord)]() -> void {
                 moveNextPostion(currentWord, location);
             };
-            processes.emplace_back(JThreadRAII(jthread(moveFn), JThreadRAII::DtorAction::join));
+            processes.emplace_back(jthread(moveFn), JThreadRAII::DtorAction::join);
         }
     }
     

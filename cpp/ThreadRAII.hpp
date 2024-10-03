@@ -49,7 +49,7 @@ public:
     ThreadRAII(ThreadRAII&&) noexcept = default;
     [[nodiscard]] ThreadRAII& operator=(ThreadRAII&&) noexcept = default;
     
-    [[nodiscard]] bool joinable() { return m_t.joinable(); }
+    [[nodiscard]] constexpr bool joinable() { return m_t.joinable(); }
     void join() { m_t.join(); }
     void swap(ThreadRAII& t) noexcept {
         using std::swap;
